@@ -88,12 +88,12 @@ interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 3. Git Best Practices
     1. All commit messages SHOULD follow the Commit Guidelines and format from
        the official git documentation:
-       https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project
+       <https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project>
     2. You SHOULD always use "--force-with-lease" when doing a force push. The
        plain "--force" option is dangerous and destructive. More information:
-       https://developer.atlassian.com/blog/2015/04/force-with-lease/
+       <https://developer.atlassian.com/blog/2015/04/force-with-lease/>
     3. You SHOULD understand and be comfortable with rebasing:
-       https://git-scm.com/book/en/v2/Git-Branching-Rebasing
+       <https://git-scm.com/book/en/v2/Git-Branching-Rebasing>
     4. It is RECOMMENDED that you always do "git pull --rebase" instead of "git
        pull" to avoid unnecessary merge commits. You can make this the default
        behavior of "git pull" with "git config --global pull.rebase true".
@@ -108,7 +108,7 @@ interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
     2. If you are using a "VERSION" file in the root of the project, this MUST
        only contain the exact version string.
     3. The version string SHOULD follow the Semantic Versioning
-       (http://semver.org/) format. Use of Semantic Versioning is OPTIONAL, but
+       (<http://semver.org/>) format. Use of Semantic Versioning is OPTIONAL, but
        the version string MUST NOT have a "v" prefix. For example "v2.11.4" is
        bad, and "2.11.4" is good.
 5. Releases
