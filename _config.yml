@@ -5,8 +5,23 @@ description: >
 author: Jim Myhrberg
 url: https://commonflow.org
 
+current_version: 1.0.0-draft.10
 versions:
   - 1.0.0-draft.10
+
+update:
+  body_tpl: |
+    ---
+    title: {{title}}
+    version: {{version}}
+    ---
+    {{content}}
+  url_tpl: "https://raw.githubusercontent.com/jimeh/common-flow/{{version}}/{{file}}"
+  img_tpl: "<img src=\"/spec/{{file}}\" width=\"100%\" />"
+  output_dir: "spec"
+  files:
+    document: common-flow.md
+    diagram: common-flow.svg
 
 gems:
   - jekyll-sitemap
