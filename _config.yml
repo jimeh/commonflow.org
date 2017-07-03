@@ -1,0 +1,24 @@
+title: Git Common Flow
+description: >
+  An attempt to gather a sensible selection of the most common usage patterns of
+  git into a single and concise specification.
+author: Jim Myhrberg
+
+current_version: 1.0.0-draft.9
+versions:
+  - 1.0.0-draft.9
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      layout: "default"
+
+markdown: redcarpet
+redcarpet:
+  extensions: ['autolink']

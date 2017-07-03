@@ -1,0 +1,46 @@
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background-color: #fdfdfd;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Open Sans Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  color: #333;
+}
+
+h1 {
+  font-size: 2.5em;
+  line-height: 1.2;
+}
+
+ol ol, ul ol {
+  list-style-type: lower-roman;
+}
+
+.content {
+  margin-top: 80px;
+}
+
+.content code {
+  background-color: rgba(27,31,35,0.05);
+  border-radius: 3px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 90%;
+  margin: 0;
+  padding: 0.2em;
+}
+
+#menu .pure-menu-label {
+  color: #999;
+  border: none;
+  padding: 0.6em 0 0.6em 0.6em;
+}
