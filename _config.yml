@@ -8,7 +8,7 @@ current_version: 1.0.0-draft.9
 versions:
   - 1.0.0-draft.9
 
-plugins:
+gems:
   - jekyll-sitemap
   - jekyll-seo-tag
 
