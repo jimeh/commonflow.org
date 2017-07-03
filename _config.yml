@@ -5,9 +5,9 @@ description: >
 author: Jim Myhrberg
 url: https://commonflow.org
 
-current_version: 1.0.0-draft.10
+current_version: 1.0.0-rc.1
 versions:
-  - 1.0.0-draft.10
+  - 1.0.0-rc.1
 
 update:
   body_tpl: |

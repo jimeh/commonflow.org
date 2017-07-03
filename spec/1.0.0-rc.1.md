@@ -1,9 +1,11 @@
 ---
-title: Git Common-Flow 1.0.0-draft.10
-version: 1.0.0-draft.10
+title: Git Common-Flow 1.0.0-rc.1
+version: 1.0.0-rc.1
 ---
-Git Common-Flow 1.0.0-draft.10
+Git Common-Flow 1.0.0-rc.1
 ==============================
+
+<img src="/spec/1.0.0-rc.1.svg" width="100%" />
 
 Summary
 -------
