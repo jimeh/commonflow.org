@@ -4,7 +4,6 @@ description: >
   git into a single and concise specification.
 author: Jim Myhrberg
 
-current_version: 1.0.0-draft.9
 versions:
   - 1.0.0-draft.9
 
