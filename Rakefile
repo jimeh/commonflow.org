@@ -18,8 +18,9 @@ task :update do
       write_file('index.md', spec[:body], " (#{version})")
     end
 
-    spec_file = File.join(config['update']['output_dir'], "#{version}.md")
-    write_file(spec_file, spec[:body])
+    filename = File.join(config['update']['output_dir'], version)
+    write_file("#{filename}.md", spec[:body])
+    write_file("#{filename}.svg", spec[:diagram]) if spec[:diagram]
   end
 end
 
