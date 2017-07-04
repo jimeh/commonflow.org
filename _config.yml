@@ -9,6 +9,13 @@ current_version: 1.0.0-rc.1
 versions:
   - 1.0.0-rc.1
 
+exclude:
+  - CNAME
+  - Gemfile
+  - Gemfile.lock
+  - Rakefile
+  - README.md
+
 update:
   body_tpl: |
     ---
