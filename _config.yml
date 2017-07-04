@@ -35,3 +35,5 @@ defaults:
       layout: "default"
 
 markdown: kramdown
+kramdown:
+  input: Pantsdown # disable smart quotes typographic symbols
