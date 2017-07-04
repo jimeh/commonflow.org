@@ -1,6 +1,11 @@
 require 'open-uri'
 require 'yaml'
 
+desc 'Build site into docs directory'
+task :build do
+  jekyll_build
+end
+
 desc 'Update index.md and spec folder based on versions in _config.yml'
 task :update do
   config = YAML.load_file('_config.yml')
@@ -22,6 +27,13 @@ task :update do
     write_file("#{filename}.md", spec[:body])
     write_file("#{filename}.svg", spec[:diagram]) if spec[:diagram]
   end
+
+  jekyll_build
+end
+
+def jekyll_build
+  puts 'Rebuilding output into docs directory...'
+  exec 'jekyll build --destination docs && touch docs/.nojekyll'
 end
 
 def write_file(file, content, comment = nil)
