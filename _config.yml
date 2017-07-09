@@ -45,6 +45,9 @@ defaults:
 
 assets:
   digest: true
+  compress:
+    css: true
+    js: true
 
 markdown: kramdown
 kramdown:
