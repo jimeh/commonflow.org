@@ -112,6 +112,8 @@ h1 { font-size: 2.5em; line-height: 1.2; }
 
 ol ol, ul ol { list-style-type: lower-roman; }
 
+ul ul ol, ul ol ol, ol ul ol, ol ol ol { list-style-type: lower-alpha; }
+
 .content { margin-top: 80px; }
 
 .content a { word-break: break-word; }

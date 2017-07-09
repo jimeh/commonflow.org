@@ -5,8 +5,9 @@ description: >
 author: Jim Myhrberg
 url: https://commonflow.org
 
-current_version: 1.0.0-rc.1
+current_version: 1.0.0-rc.2
 versions:
+  - 1.0.0-rc.2
   - 1.0.0-rc.1
 
 exclude:
