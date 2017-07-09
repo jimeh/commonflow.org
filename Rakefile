@@ -42,15 +42,8 @@ def write_file(file, content, comment = nil)
 end
 
 def fetch_spec(version, config)
-  doc_url = config['url_tpl']
-            .gsub('{{version}}', version)
-            .gsub('{{file}}', config['files']['document'])
-  diagram_url = config['url_tpl']
-                .gsub('{{version}}', version)
-                .gsub('{{file}}', config['files']['diagram'])
-
-  document = get(doc_url)
-  diagram = get(diagram_url)
+  document = get(build_file_url('document', version, config))
+  diagram = get(build_file_url('diagram', version, config))
 
   if diagram
     img_tag = config['img_tpl'].gsub('{{file}}', "#{version}.svg")
@@ -58,10 +51,9 @@ def fetch_spec(version, config)
   end
 
   title = document.split("\n", 2).first
-  body = config['body_tpl']
-         .gsub('{{title}}', title)
-         .gsub('{{version}}', version)
-         .gsub('{{content}}', document)
+  body = config['body_tpl'].gsub('{{content}}', document)
+                           .gsub('{{title}}', title)
+                           .gsub('{{version}}', version)
 
   {
     version: version,
@@ -71,15 +63,10 @@ def fetch_spec(version, config)
   }
 end
 
-def fetch_document(url)
-  response = get(url)
-  {
-
-    body: response
-  }
-end
-
-def fetch_diagram(url)
+def build_file_url(file, version, config)
+  config['url_tpl']
+    .gsub('{{version}}', version)
+    .gsub('{{file}}', config['files'][file])
 end
 
 def get(url)
