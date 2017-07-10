@@ -3,6 +3,7 @@ description: >
   An attempt to gather a sensible selection of the most common usage patterns of
   git into a single and concise specification.
 author: Jim Myhrberg
+hostname: commonflow.org
 url: https://commonflow.org
 
 current_version: 1.0.0-rc.2
