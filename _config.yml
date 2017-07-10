@@ -30,7 +30,7 @@ update:
     document: common-flow.md
     diagram: common-flow.svg
 
-gems:
+plugins:
   - jekyll-assets
   - jekyll-pants
   - jekyll-sitemap
