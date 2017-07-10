@@ -36,6 +36,7 @@ plugins:
   - jekyll-pants
   - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-tidy
 
 defaults:
   -

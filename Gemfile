@@ -13,6 +13,7 @@ group :jekyll_plugins do
   gem 'jekyll-pants'
   gem 'jekyll-seo-tag'
   gem 'jekyll-sitemap'
+  gem 'jekyll-tidy'
   gem 'uglifier' # required by 'jekyll-assets' for JS compression
 end
 
