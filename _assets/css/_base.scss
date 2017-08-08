@@ -47,8 +47,31 @@ ul ul ol, ul ol ol, ol ul ol, ol ol ol {
   }
 }
 
-#menu .pure-menu-label {
-  color: #999;
-  border: none;
-  padding: 0.6em 0 0.6em 0.6em;
+
+#menu {
+  .pure-menu-label {
+    color: #999;
+    border: none;
+    padding: 0.6em 0 0.6em 0.6em;
+  }
+
+  .links {
+    font-size: 50px;
+    position: absolute;
+    bottom: 10px;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+
+    a {
+      color: #555;
+      padding: 0;
+      position: relative;
+      text-decoration: none;
+
+      &:hover {
+        color: #777;
+      }
+    }
+  }
 }
