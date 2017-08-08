@@ -32,19 +32,19 @@ ul ul ol, ul ol ol, ol ul ol, ol ol ol {
 
 .content {
   margin-top: 80px;
-}
 
-.content a {
-  word-break: break-word;
-}
+  a {
+    word-break: break-word;
+  }
 
-.content code {
-  background-color: rgba(27,31,35,0.05);
-  border-radius: 3px;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 90%;
-  margin: 0;
-  padding: 0.2em;
+  code {
+    background-color: rgba(27,31,35,0.05);
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 90%;
+    margin: 0;
+    padding: 0.2em;
+  }
 }
 
 #menu .pure-menu-label {
