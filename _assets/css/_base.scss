@@ -41,12 +41,25 @@ ul ul ol, ul ol ol, ol ul ol, ol ol ol {
     background-color: rgba(27,31,35,0.05);
     border-radius: 3px;
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-size: 90%;
+    font-size: 85%;
     margin: 0;
-    padding: 0.2em;
+    padding: 0.3em 0.4em 0.1em 0.4em;
+  }
+
+  pre {
+    background-color: #f6f8fa;
+    border-radius: 3px;
+    line-height: 1.45;
+    padding: 16px;
+  }
+
+  pre > code {
+    background-color: transparent !important;
+    border-radius: none;
+    font-size: 90%;
+    padding: 0;
   }
 }
-
 
 #menu {
   .pure-menu-label {
