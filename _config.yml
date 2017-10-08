@@ -27,7 +27,7 @@ update:
     version: {{version}}
     ---
     {{content}}
-  url_tpl: "https://raw.githubusercontent.com/jimeh/common-flow/{{version}}/{{file}}"
+  url_tpl: "https://github.com/jimeh/common-flow/raw/{{version}}/{{file}}"
   img_tpl: "<img src=\"/spec/{{file}}\" width=\"100%\" />"
   output_dir: "spec"
   files:
