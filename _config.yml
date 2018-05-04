@@ -7,8 +7,9 @@ hostname: commonflow.org
 url: https://commonflow.org
 repo_url: https://github.com/jimeh/common-flow
 
-current_version: 1.0.0-rc.4
+current_version: 1.0.0-rc.5
 versions:
+  - 1.0.0-rc.5
   - 1.0.0-rc.4
   - 1.0.0-rc.3
   - 1.0.0-rc.2
@@ -53,6 +54,7 @@ assets:
   compress:
     css: true
     js: true
+    img: true
 
 markdown: kramdown
 kramdown:
