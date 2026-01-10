@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "update": "tsx scripts/update-specs.ts",
+    "update": "bun scripts/update-specs.ts",
     "astro": "astro"
   },
   "dependencies": {
@@ -17,7 +17,6 @@
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.0.0",
     "tailwindcss": "^4.0.0",
-    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
 }

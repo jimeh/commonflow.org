@@ -151,7 +151,7 @@ async function main(): Promise<void> {
     }
   }
 
-  console.log("\nDone! Run `npm run build` to rebuild the site.");
+  console.log("\nDone! Run `bun run build` to rebuild the site.");
 }
 
 main();
