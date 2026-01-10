@@ -1,106 +1,17 @@
 ---
 import { getCollection } from "astro:content";
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
 
-import SinglePage from "../layouts/SinglePage.astro";
-import Header from "../components/Header.astro";
-import Hero from "../components/Hero.astro";
-import AboutSection from "../components/AboutSection.astro";
-import SpecSection from "../components/SpecSection.astro";
-import FAQSection from "../components/FAQSection.astro";
-import { parseSpecContent } from "../utils/parseSpecContent";
-import { config } from "../config";
+import SpecLayout from "../layouts/SpecLayout.astro";
+import { getVersionInfo } from "../utils/versions";
 
-// Render the current/latest version
-const version = config.currentVersion;
+// Get version info and render the current/latest version
+const { versions, currentVersion } = await getVersionInfo();
 const specs = await getCollection("spec");
-const spec = specs.find((s) => s.data.version === version);
+const spec = specs.find((s) => s.data.version === currentVersion);
 
 if (!spec) {
-  throw new Error(`Spec version ${version} not found`);
+  throw new Error(`Spec version ${currentVersion} not found`);
 }
-
-// Read and process the markdown file
-const filePath = path.join(
-  process.cwd(),
-  "src/content/spec",
-  `${version}.md`
-);
-const content = fs.readFileSync(filePath, "utf-8");
-
-// Remove frontmatter
-const body = content.replace(/^---[\s\S]*?---\n/, "");
-
-// Process markdown to HTML
-const result = await unified()
-  .use(remarkParse)
-  .use(remarkRehype, { allowDangerousHtml: true })
-  .use(rehypeStringify, { allowDangerousHtml: true })
-  .process(body);
-
-const html = String(result);
-
-// Parse the content into sections
-const parsed = parseSpecContent(html, version);
 ---
 
-<SinglePage title={spec.data.title} version={version}>
-  <Header version={version} />
-
-  <main>
-    <Hero version={version} svgPath={parsed.svgPath} />
-
-    <AboutSection
-      introduction={parsed.introduction}
-      summary={parsed.summary}
-      about={parsed.about}
-      license={parsed.license}
-    />
-
-    <SpecSection
-      terminology={parsed.terminology}
-      specification={parsed.specification}
-      tocItems={parsed.tocItems}
-    />
-
-    <FAQSection items={parsed.faq} />
-  </main>
-
-  <!-- Footer -->
-  <footer
-    class="py-8 text-center text-sm
-           text-[var(--color-text-muted)]
-           dark:text-[var(--color-dark-text-muted)]
-           border-t border-[var(--color-border)]
-           dark:border-[var(--color-dark-border)]"
-  >
-    <div class="section-container">
-      <p>
-        Git Common-Flow is authored by
-        <a
-          href="https://jimeh.me/"
-          class="hover:text-[var(--color-accent)]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Jim Myhrberg
-        </a>
-      </p>
-      <p class="mt-2">
-        <a
-          href="https://creativecommons.org/licenses/by/4.0/"
-          class="hover:text-[var(--color-accent)]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          CC BY 4.0
-        </a>
-      </p>
-    </div>
-  </footer>
-</SinglePage>
+<SpecLayout spec={spec} versions={versions} />

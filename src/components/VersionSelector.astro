@@ -1,4 +1,6 @@
 ---
+import { Icon } from "astro-icon/components";
+
 interface Props {
   currentVersion: string;
   versions: string[];
@@ -7,76 +9,128 @@ interface Props {
 const { currentVersion, versions } = Astro.props;
 ---
 
-<div class="version-selector relative">
-  <select
-    data-version-select
-    class="appearance-none bg-transparent border border-[var(--color-border)]
-           dark:border-[var(--color-dark-border)] rounded-lg px-3 py-1.5
-           pr-8 text-sm font-mono cursor-pointer
-           text-[var(--color-text-secondary)]
-           dark:text-[var(--color-dark-text-secondary)]
-           hover:border-[var(--color-accent)]
-           focus:border-[var(--color-accent)]
-           focus:outline-none transition-colors"
+<div class="relative" data-version-selector>
+  <!-- Trigger button -->
+  <button
+    type="button"
+    data-version-trigger
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    class="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-mono
+           border border-gray-200 dark:border-neutral-700
+           rounded-md bg-transparent cursor-pointer transition-colors
+           text-gray-600 dark:text-neutral-400
+           hover:border-sky-600 hover:text-gray-950 dark:hover:text-neutral-50"
+  >
+    <span>v{currentVersion}</span>
+    <Icon
+      name="heroicons:chevron-down"
+      data-arrow-icon
+      class="w-3.5 h-3.5 transition-transform duration-150"
+    />
+  </button>
+
+  <!-- Dropdown menu -->
+  <div
+    data-version-dropdown
+    role="listbox"
+    aria-label="Select version"
+    class="absolute top-full left-0 mt-2 min-w-full p-1.5 z-50
+           bg-gray-50 dark:bg-neutral-900
+           border border-gray-200 dark:border-neutral-700
+           rounded-lg shadow-lg
+           opacity-0 invisible -translate-y-1 transition-all duration-150
+           data-[open]:opacity-100 data-[open]:visible data-[open]:translate-y-0"
   >
     {
       versions.map((v) => (
-        <option value={v} selected={v === currentVersion}>
+        <a
+          href={`/spec/${v}`}
+          role="option"
+          aria-selected={v === currentVersion}
+          class:list={[
+            "block px-3 py-2 font-mono text-sm rounded transition-colors",
+            "text-gray-600 dark:text-neutral-400",
+            "hover:bg-gray-100 dark:hover:bg-neutral-800",
+            "hover:text-gray-950 dark:hover:text-neutral-50",
+            v === currentVersion && [
+              "bg-sky-500/15 dark:bg-sky-500/20",
+              "text-sky-600 dark:text-sky-400",
+            ],
+          ]}
+        >
           v{v}
-        </option>
+        </a>
       ))
     }
-  </select>
-  <!-- Dropdown arrow -->
-  <svg
-    class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none
-           text-[var(--color-text-muted)] dark:text-[var(--color-dark-text-muted)]"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M19 9l-7 7-7-7"></path>
-  </svg>
+  </div>
 </div>
 
 <script>
   function initVersionSelectors() {
-    const selects = document.querySelectorAll(
-      "[data-version-select]"
-    ) as NodeListOf<HTMLSelectElement>;
+    const selectors = document.querySelectorAll("[data-version-selector]");
 
-    selects.forEach((select) => {
-      // Avoid adding duplicate listeners
-      if (select.dataset.initialized) return;
-      select.dataset.initialized = "true";
+    selectors.forEach((selector) => {
+      if ((selector as HTMLElement).dataset.initialized) return;
+      (selector as HTMLElement).dataset.initialized = "true";
 
-      select.addEventListener("change", (e) => {
-        const target = e.target as HTMLSelectElement;
-        const version = target.value;
-        window.location.href = `/spec/${version}`;
+      const trigger = selector.querySelector(
+        "[data-version-trigger]",
+      ) as HTMLButtonElement;
+      const dropdown = selector.querySelector(
+        "[data-version-dropdown]",
+      ) as HTMLElement;
+      const arrow = selector.querySelector("[data-arrow-icon]") as HTMLElement;
+
+      if (!trigger || !dropdown) return;
+
+      const open = () => {
+        dropdown.dataset.open = "true";
+        trigger.setAttribute("aria-expanded", "true");
+        if (arrow) arrow.style.transform = "rotate(180deg)";
+      };
+
+      const close = () => {
+        delete dropdown.dataset.open;
+        trigger.setAttribute("aria-expanded", "false");
+        if (arrow) arrow.style.transform = "";
+      };
+
+      trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.dataset.open === "true";
+
+        // Close all other dropdowns
+        document
+          .querySelectorAll("[data-version-dropdown][data-open]")
+          .forEach((d) => {
+            delete (d as HTMLElement).dataset.open;
+            const t = d.previousElementSibling as HTMLElement;
+            t?.setAttribute("aria-expanded", "false");
+            const a = t?.querySelector("[data-arrow-icon]") as HTMLElement;
+            if (a) a.style.transform = "";
+          });
+
+        if (isOpen) {
+          close();
+        } else {
+          open();
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!selector.contains(e.target as Node)) close();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && dropdown.dataset.open === "true") {
+          close();
+          trigger.focus();
+        }
       });
     });
   }
 
-  // Initialize on load
   initVersionSelectors();
-
-  // Re-initialize on Astro page transitions
   document.addEventListener("astro:after-swap", initVersionSelectors);
 </script>
-
-<style>
-  select option {
-    background-color: var(--color-bg-primary);
-    color: var(--color-text-primary);
-  }
-
-  :global(.dark) select option {
-    background-color: var(--color-dark-bg-primary);
-    color: var(--color-dark-text-primary);
-  }
-</style>

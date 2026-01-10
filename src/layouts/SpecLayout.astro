@@ -1,0 +1,69 @@
+---
+import type { CollectionEntry } from "astro:content";
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+import BaseLayout from "./BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import AboutSection from "../components/AboutSection.astro";
+import SpecSection from "../components/SpecSection.astro";
+import FAQSection from "../components/FAQSection.astro";
+import Footer from "../components/Footer.astro";
+import { parseSpecContent } from "../utils/parseSpecContent";
+
+interface Props {
+  spec: CollectionEntry<"spec">;
+  versions: string[];
+}
+
+const { spec, versions } = Astro.props;
+const version = spec.data.version;
+
+// Read the markdown file
+const filePath = path.join(process.cwd(), "src/content/spec", `${version}.md`);
+const content = fs.readFileSync(filePath, "utf-8");
+
+// Remove frontmatter
+const markdown = content.replace(/^---[\s\S]*?---\n/, "");
+
+// Parse the content into sections (handles markdown -> HTML internally)
+const parsed = await parseSpecContent(markdown);
+
+// Read SVG content for inline embedding
+const svgFilePath = path.join(process.cwd(), "src/content/spec", `${version}.svg`);
+let svgContent: string | null = null;
+if (fs.existsSync(svgFilePath)) {
+  svgContent = fs.readFileSync(svgFilePath, "utf-8");
+}
+---
+
+<BaseLayout title={spec.data.title}>
+  <Header version={version} versions={versions} />
+
+  <main>
+    <Hero
+      version={version}
+      versions={versions}
+      svgContent={svgContent}
+    />
+
+    <AboutSection
+      introduction={parsed.introduction}
+      summary={parsed.summary}
+      license={parsed.license}
+    />
+
+    <SpecSection
+      terminology={parsed.terminology}
+      terminologyTitle={parsed.terminologyTitle}
+      specification={parsed.specification}
+      tocItems={parsed.tocItems}
+      version={version}
+    />
+
+    <FAQSection items={parsed.faq} />
+  </main>
+
+  <Footer />
+</BaseLayout>

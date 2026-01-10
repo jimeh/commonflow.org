@@ -1,87 +1,105 @@
 ---
-// Theme toggle component - sun/moon icon to switch between light and dark mode
+import { Icon } from "astro-icon/components";
 ---
 
-<button
-  data-theme-toggle
-  type="button"
-  class="p-2 rounded-lg text-[var(--color-text-muted)]
-         dark:text-[var(--color-dark-text-muted)]
-         hover:text-[var(--color-text-primary)]
-         dark:hover:text-[var(--color-dark-text-primary)]
-         hover:bg-[var(--color-bg-secondary)]
-         dark:hover:bg-[var(--color-dark-bg-secondary)]
-         transition-colors duration-200"
-  aria-label="Toggle dark mode"
->
-  <!-- Sun icon (shown in dark mode) -->
-  <svg
-    data-sun-icon
-    class="hidden w-5 h-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    stroke-width="2"
+<div class="relative group">
+  <button
+    data-theme-toggle
+    type="button"
+    class="p-2 rounded-lg cursor-pointer transition-colors duration-200
+           text-gray-500 dark:text-neutral-500
+           hover:text-gray-950 dark:hover:text-neutral-50
+           hover:bg-gray-100 dark:hover:bg-neutral-800"
+    aria-label="Toggle theme"
   >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343
-         6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16
-         12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-  </svg>
-  <!-- Moon icon (shown in light mode) -->
-  <svg
-    data-moon-icon
-    class="w-5 h-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    stroke-width="2"
+    <Icon name="heroicons:sun" data-theme-icon="light" class="hidden w-5 h-5" />
+    <Icon name="heroicons:moon" data-theme-icon="dark" class="hidden w-5 h-5" />
+    <Icon
+      name="heroicons:computer-desktop"
+      data-theme-icon="auto"
+      class="hidden w-5 h-5"
+    />
+  </button>
+  <!-- Tooltip -->
+  <div
+    class="absolute left-1/2 -translate-x-1/2 top-full mt-2
+           px-2 py-1 text-xs font-medium whitespace-nowrap rounded-md shadow-sm
+           bg-gray-900 text-white dark:bg-white dark:text-gray-900
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200 pointer-events-none"
   >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003
-         9.003 0 008.354-5.646z"></path>
-  </svg>
-</button>
+    <span data-tooltip-text="light" class="hidden">Light</span>
+    <span data-tooltip-text="dark" class="hidden">Dark</span>
+    <span data-tooltip-text="auto" class="hidden">System</span>
+  </div>
+</div>
 
 <script>
+  type ThemeMode = "light" | "dark" | "auto";
+
   function initTheme() {
     const toggles = document.querySelectorAll(
-      "[data-theme-toggle]"
+      "[data-theme-toggle]",
     ) as NodeListOf<HTMLButtonElement>;
 
-    function getTheme(): "dark" | "light" {
+    function getStoredMode(): ThemeMode {
       const stored = localStorage.getItem("theme");
-      if (stored === "dark" || stored === "light") {
+      if (stored === "dark" || stored === "light" || stored === "auto") {
         return stored;
       }
+      return "auto";
+    }
+
+    function getSystemTheme(): "dark" | "light" {
       return window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
     }
 
-    function updateAllIcons(isDark: boolean) {
-      // Update all sun/moon icons on the page
-      document.querySelectorAll("[data-sun-icon]").forEach((icon) => {
-        icon.classList.toggle("hidden", !isDark);
+    function getEffectiveTheme(mode: ThemeMode): "dark" | "light" {
+      if (mode === "auto") {
+        return getSystemTheme();
+      }
+      return mode;
+    }
+
+    function updateAllIcons(mode: ThemeMode) {
+      document.querySelectorAll("[data-theme-icon]").forEach((icon) => {
+        const iconMode = (icon as HTMLElement).dataset.themeIcon;
+        icon.classList.toggle("hidden", iconMode !== mode);
       });
-      document.querySelectorAll("[data-moon-icon]").forEach((icon) => {
-        icon.classList.toggle("hidden", isDark);
+      document.querySelectorAll("[data-tooltip-text]").forEach((text) => {
+        const textMode = (text as HTMLElement).dataset.tooltipText;
+        text.classList.toggle("hidden", textMode !== mode);
       });
     }
 
-    function setTheme(theme: "dark" | "light") {
-      localStorage.setItem("theme", theme);
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      updateAllIcons(theme === "dark");
+    function applyTheme(mode: ThemeMode) {
+      const effective = getEffectiveTheme(mode);
+      if (effective === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      updateAllIcons(mode);
+    }
+
+    function setMode(mode: ThemeMode) {
+      localStorage.setItem("theme", mode);
+      applyTheme(mode);
+    }
+
+    function cycleMode(): ThemeMode {
+      const current = getStoredMode();
+      // Cycle: light → dark → auto → light
+      if (current === "light") return "dark";
+      if (current === "dark") return "auto";
+      return "light";
     }
 
     // Initialize theme
-    const currentTheme = getTheme();
-    setTheme(currentTheme);
+    const currentMode = getStoredMode();
+    applyTheme(currentMode);
 
     // Attach click handlers to all toggle buttons
     toggles.forEach((toggle) => {
@@ -90,17 +108,16 @@
       toggle.dataset.initialized = "true";
 
       toggle.addEventListener("click", () => {
-        const isDark = document.documentElement.classList.contains("dark");
-        setTheme(isDark ? "light" : "dark");
+        setMode(cycleMode());
       });
     });
 
-    // Listen for system preference changes
+    // Listen for system preference changes (only affects auto mode)
     window
       .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (e) => {
-        if (!localStorage.getItem("theme")) {
-          setTheme(e.matches ? "dark" : "light");
+      .addEventListener("change", () => {
+        if (getStoredMode() === "auto") {
+          applyTheme("auto");
         }
       });
   }

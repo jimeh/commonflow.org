@@ -1,4 +1,6 @@
 ---
+import { Icon } from "astro-icon/components";
+import SectionHeader from "./SectionHeader.astro";
 import type { FAQItem } from "../utils/parseSpecContent";
 
 interface Props {
@@ -8,51 +10,49 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<section id="faq" class="faq-section py-20 sm:py-28">
+<section id="faq" class="py-20 sm:py-28">
   <div class="section-container">
     <div class="max-w-3xl mx-auto">
-      <!-- Section header -->
-      <div class="mb-12 text-center">
-        <h2 class="text-3xl sm:text-4xl mb-4">FAQ</h2>
-        <p
-          class="text-lg text-[var(--color-text-secondary)]
-                 dark:text-[var(--color-dark-text-secondary)]"
-        >
-          Common questions about Git Common-Flow
-        </p>
-      </div>
+      <SectionHeader
+        title="FAQ"
+        subtitle="Common questions about Git Common-Flow"
+      />
 
       <!-- FAQ Items -->
       <div class="space-y-0">
         {
-          items.map((item, index) => (
-            <div class="faq-item" data-faq-item>
+          items.map((item) => (
+            <div
+              class="border-b border-gray-200 dark:border-neutral-800"
+              data-faq-item
+            >
               <button
-                class="faq-question"
+                class="flex justify-between items-center w-full py-6 text-left
+                       font-display text-lg font-semibold cursor-pointer
+                       transition-colors
+                       text-gray-950 dark:text-neutral-50
+                       hover:text-sky-600"
                 aria-expanded="false"
                 data-faq-trigger
               >
                 <span class="pr-4">{item.question}</span>
-                <svg
+                <Icon
+                  name="heroicons:chevron-down"
                   class="w-5 h-5 flex-shrink-0 transition-transform duration-200"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
                   data-faq-icon
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                />
               </button>
               <div
-                class="faq-answer hidden prose-spec spec-content"
+                class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out"
                 data-faq-content
-                set:html={item.answer}
-              />
+              >
+                <div class="overflow-hidden">
+                  <div
+                    class="pb-6 text-gray-600 dark:text-neutral-400 prose-spec"
+                    set:html={item.answer}
+                  />
+                </div>
+              </div>
             </div>
           ))
         }
@@ -75,33 +75,13 @@ const { items } = Astro.props;
       trigger.addEventListener("click", () => {
         const isExpanded = trigger.getAttribute("aria-expanded") === "true";
 
-        // Close all other items
-        items.forEach((otherItem) => {
-          if (otherItem !== item) {
-            const otherTrigger = otherItem.querySelector("[data-faq-trigger]");
-            const otherContent = otherItem.querySelector("[data-faq-content]");
-            const otherIcon = otherItem.querySelector("[data-faq-icon]");
-
-            otherTrigger?.setAttribute("aria-expanded", "false");
-            otherContent?.classList.add("hidden");
-            otherIcon?.classList.remove("rotate-180");
-          }
-        });
-
         // Toggle current item
         trigger.setAttribute("aria-expanded", isExpanded ? "false" : "true");
-        content.classList.toggle("hidden", isExpanded);
+        content.classList.toggle("grid-rows-[1fr]", !isExpanded);
+        content.classList.toggle("grid-rows-[0fr]", isExpanded);
         icon.classList.toggle("rotate-180", !isExpanded);
       });
     });
-
-    // Open first item by default
-    const firstTrigger = items[0]?.querySelector(
-      "[data-faq-trigger]"
-    ) as HTMLButtonElement;
-    if (firstTrigger) {
-      firstTrigger.click();
-    }
   }
 
   // Initialize on load
@@ -110,30 +90,3 @@ const { items } = Astro.props;
   // Re-initialize on Astro page transitions
   document.addEventListener("astro:after-swap", initFAQ);
 </script>
-
-<style>
-  .faq-section {
-    background-color: var(--color-bg-secondary);
-  }
-
-  :global(.dark) .faq-section {
-    background-color: var(--color-dark-bg-secondary);
-  }
-
-  .spec-content :global(p:last-child) {
-    margin-bottom: 0;
-  }
-
-  .spec-content :global(ul),
-  .spec-content :global(ol) {
-    margin-top: 1rem;
-  }
-
-  .spec-content :global(li) {
-    color: var(--color-text-secondary);
-  }
-
-  :global(.dark) .spec-content :global(li) {
-    color: var(--color-dark-text-secondary);
-  }
-</style>

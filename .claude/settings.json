@@ -1,10 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bun install:*)",
-      "Bash(bun run build:*)",
-      "Bash(bun run update:*)",
-      "Bash(bun update:*)"
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run astro:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run check:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm run format:check:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run preview:*)",
+      "Bash(npm run update-specs:*)",
+      "mcp__deepwiki__ask_question"
     ]
   }
 }

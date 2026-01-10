@@ -1,27 +1,41 @@
 ---
+import { Icon } from "astro-icon/components";
+import SectionHeader from "./SectionHeader.astro";
 import SpecSidebar from "./SpecSidebar.astro";
 import type { TocItem } from "../utils/parseSpecContent";
 
 interface Props {
   terminology: string;
+  terminologyTitle: string;
   specification: string;
   tocItems: TocItem[];
+  version: string;
 }
 
-const { terminology, specification, tocItems } = Astro.props;
+const { terminology, terminologyTitle, specification, tocItems, version } =
+  Astro.props;
 ---
 
 <section id="spec" class="py-20 sm:py-28">
   <div class="section-container">
-    <!-- Section header -->
-    <div class="max-w-3xl mx-auto mb-12 text-center">
-      <h2 class="text-3xl sm:text-4xl mb-4">The Specification</h2>
-      <p
-        class="text-lg text-[var(--color-text-secondary)]
-               dark:text-[var(--color-dark-text-secondary)]"
+    <SectionHeader
+      title="The Specification"
+      subtitle="The complete Git Common-Flow specification"
+      class="max-w-3xl mx-auto"
+    />
+
+    <div class="flex justify-center mb-8 -mt-8">
+      <a
+        href={`/spec/${version}/md`}
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
+               font-medium rounded-lg transition-colors
+               text-gray-500 dark:text-neutral-500
+               hover:bg-gray-100 hover:text-gray-700
+               dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
       >
-        The complete Git Common-Flow specification
-      </p>
+        <Icon name="heroicons:code-bracket" class="w-4 h-4" />
+        View Markdown Version
+      </a>
     </div>
 
     <!-- Content with sidebar -->
@@ -33,16 +47,16 @@ const { terminology, specification, tocItems } = Astro.props;
 
       <!-- Main content -->
       <div class="flex-1 min-w-0">
-        <article class="prose-spec spec-content">
+        <article class="prose-spec">
           <!-- Terminology -->
           <section id="terminology">
-            <h2>Terminology</h2>
+            <h2>{terminologyTitle}</h2>
             <Fragment set:html={terminology} />
           </section>
 
           <!-- Main specification -->
           <section id="specification">
-            <h2>Git Common-Flow Specification</h2>
+            <h2>Specification</h2>
             <Fragment set:html={specification} />
           </section>
         </article>
@@ -51,129 +65,7 @@ const { terminology, specification, tocItems } = Astro.props;
   </div>
 </section>
 
-<style>
-  .spec-content {
-    max-width: var(--content-max-width);
-  }
-
-  .spec-content :global(h2) {
-    font-family: var(--font-display);
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    scroll-margin-top: calc(var(--header-height) + 2rem);
-  }
-
-  :global(.dark) .spec-content :global(h2) {
-    border-bottom-color: var(--color-dark-border);
-    color: var(--color-dark-text-primary);
-  }
-
-  .spec-content :global(h2:first-child) {
-    margin-top: 0;
-  }
-
-  .spec-content :global(h3) {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: var(--color-text-secondary);
-  }
-
-  :global(.dark) .spec-content :global(h3) {
-    color: var(--color-dark-text-secondary);
-  }
-
-  .spec-content :global(p) {
-    margin-bottom: 1.25rem;
-    color: var(--color-text-secondary);
-  }
-
-  :global(.dark) .spec-content :global(p) {
-    color: var(--color-dark-text-secondary);
-  }
-
-  .spec-content :global(strong) {
-    color: var(--color-text-primary);
-    font-weight: 600;
-  }
-
-  :global(.dark) .spec-content :global(strong) {
-    color: var(--color-dark-text-primary);
-  }
-
-  .spec-content :global(ul) {
-    margin-bottom: 1.25rem;
-    padding-left: 1.5rem;
-  }
-
-  .spec-content :global(ol) {
-    margin-bottom: 1.25rem;
-    padding-left: 2.5rem;
-    counter-reset: item;
-    list-style: none;
-  }
-
-  .spec-content :global(ol > li) {
-    counter-increment: item;
-    position: relative;
-  }
-
-  .spec-content :global(ol > li::before) {
-    content: counters(item, ".") ".";
-    position: absolute;
-    left: -2.5rem;
-    width: 2rem;
-    text-align: right;
-    font-weight: 500;
-    color: var(--color-text-muted);
-  }
-
-  :global(.dark) .spec-content :global(ol > li::before) {
-    color: var(--color-dark-text-muted);
-  }
-
-  .spec-content :global(li) {
-    margin-bottom: 0.5rem;
-    color: var(--color-text-secondary);
-  }
-
-  :global(.dark) .spec-content :global(li) {
-    color: var(--color-dark-text-secondary);
-  }
-
-  .spec-content :global(a) {
-    color: var(--color-accent);
-    text-decoration: none;
-    transition: color 150ms ease;
-  }
-
-  .spec-content :global(a:hover) {
-    color: var(--color-accent-light);
-  }
-
-  .spec-content :global(blockquote) {
-    border-left: 3px solid var(--color-accent);
-    padding-left: 1.5rem;
-    margin: 1.5rem 0;
-    color: var(--color-text-muted);
-    font-style: italic;
-  }
-
-  :global(.dark) .spec-content :global(blockquote) {
-    color: var(--color-dark-text-muted);
-  }
-
-  .spec-content :global(img) {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 2rem 0;
-  }
-</style>
+<script>
+  import { initClauseHighlight } from "../scripts/clauseHighlight";
+  initClauseHighlight();
+</script>

@@ -1,30 +1,32 @@
 ---
-import Default from "../layouts/Default.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<Default title="Page Not Found">
-  <div class="text-center">
-    <h1
-      class="text-[8rem] sm:text-[12rem] font-display font-bold leading-none
-             text-[var(--color-border-strong)]
-             dark:text-[var(--color-dark-border-strong)]"
-    >
-      404
-    </h1>
-    <p
-      class="text-xl mb-2 text-[var(--color-text-secondary)]
-             dark:text-[var(--color-dark-text-secondary)]"
-    >
-      Page not found
-    </p>
-    <p class="text-[var(--color-text-muted)] dark:text-[var(--color-dark-text-muted)]">
-      The page you're looking for doesn't exist.
-    </p>
-    <a
-      href="/"
-      class="inline-block mt-8 btn btn-primary"
-    >
-      Go to homepage
-    </a>
+<BaseLayout title="Page Not Found">
+  <div class="flex flex-col items-center justify-center min-h-screen p-8">
+    <div class="text-center">
+      <h1
+        class="text-[8rem] sm:text-[12rem] font-display font-bold leading-none
+               text-gray-300 dark:text-neutral-700"
+      >
+        404
+      </h1>
+      <p class="text-xl mb-2 text-gray-600 dark:text-neutral-400">
+        Page not found
+      </p>
+      <p class="text-gray-500 dark:text-neutral-500">
+        The page you're looking for doesn't exist.
+      </p>
+      <a
+        href="/"
+        class="inline-flex items-center justify-center gap-2 mt-8
+               px-5 py-2.5 text-sm font-medium rounded-lg
+               transition-all cursor-pointer
+               bg-sky-600 text-white
+               hover:bg-sky-500 hover:-translate-y-0.5 hover:shadow-md"
+      >
+        Go to homepage
+      </a>
+    </div>
   </div>
-</Default>
+</BaseLayout>

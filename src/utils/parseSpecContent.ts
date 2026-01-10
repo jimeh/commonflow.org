@@ -1,12 +1,21 @@
 /**
- * Parses rendered spec HTML into structured sections for the single-page
- * layout.
+ * Parses spec content using markdown AST for robust section extraction.
  */
+
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
+import { getIconData, iconToSVG, iconToHTML } from "@iconify/utils";
+import heroicons from "@iconify-json/heroicons/icons.json";
+import type { Root, RootContent, Heading, List, ListItem, Html } from "mdast";
+import type { Root as HastRoot } from "hast";
 
 export interface TocItem {
   id: string;
   title: string;
   level: number;
+  clause?: string;
 }
 
 export interface FAQItem {
@@ -19,23 +28,24 @@ export interface SpecSection {
   id: string;
   title: string;
   content: string;
+  clause: string;
 }
 
 export interface ParsedSpec {
-  svgPath: string;
   introduction: string;
   summary: string;
   terminology: string;
+  terminologyTitle: string;
   specification: string;
+  specificationTitle: string;
   specSections: SpecSection[];
   faq: FAQItem[];
-  about: string;
   license: string;
   tocItems: TocItem[];
 }
 
 /**
- * Convert a heading text to a URL-friendly ID
+ * Convert text to a URL-friendly ID
  */
 function slugify(text: string): string {
   return text
@@ -46,140 +56,243 @@ function slugify(text: string): string {
 }
 
 /**
- * Extract content between two headings or to the end of the document
+ * Generate link icon SVG from heroicons icon set
  */
-function extractSection(
-  html: string,
-  startHeading: string,
-  endHeadings: string[] = []
-): string {
-  // Find the heading (h2) - use partial match to handle additional text
-  // e.g., "Git Common-Flow Specification (Common-Flow)"
-  const headingPattern = new RegExp(
-    `<h2[^>]*>[^<]*${escapeRegex(startHeading)}[^<]*</h2>`,
-    "i"
-  );
-  const match = html.match(headingPattern);
-  if (!match || match.index === undefined) return "";
-
-  const startIdx = match.index + match[0].length;
-
-  // Find the next section heading
-  let endIdx = html.length;
-  for (const endHeading of endHeadings) {
-    const endPattern = new RegExp(
-      `<h2[^>]*>\\s*${escapeRegex(endHeading)}\\s*</h2>`,
-      "i"
-    );
-    const endMatch = html.slice(startIdx).match(endPattern);
-    if (endMatch && endMatch.index !== undefined) {
-      const possibleEnd = startIdx + endMatch.index;
-      if (possibleEnd < endIdx) {
-        endIdx = possibleEnd;
-      }
-    }
+function generateLinkIconSvg(): string {
+  const iconData = getIconData(heroicons, "link");
+  if (!iconData) {
+    return "";
   }
-
-  // Also check for any h2 as a fallback
-  const anyH2 = html.slice(startIdx).match(/<h2[^>]*>/i);
-  if (anyH2 && anyH2.index !== undefined) {
-    const possibleEnd = startIdx + anyH2.index;
-    if (possibleEnd < endIdx) {
-      endIdx = possibleEnd;
-    }
-  }
-
-  return html.slice(startIdx, endIdx).trim();
+  const result = iconToSVG(iconData);
+  return iconToHTML(result.body, {
+    ...result.attributes,
+    class: "clause-link-icon",
+    stroke: "currentColor",
+    "stroke-width": "2",
+  });
 }
 
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+type MdastNode = Root | RootContent;
+
+/**
+ * Extract plain text from an mdast node tree
+ */
+function extractText(node: MdastNode): string {
+  if ("value" in node && typeof node.value === "string") {
+    return node.value;
+  }
+  if ("children" in node && Array.isArray(node.children)) {
+    return node.children.map((child) => extractText(child)).join("");
+  }
+  return "";
 }
 
 /**
- * Extract the numbered spec sections (1. TL;DR, 2. The Master Branch, etc.)
+ * Find index of heading containing specific text
  */
-function extractSpecSections(specContent: string): SpecSection[] {
+function findHeadingIndex(
+  nodes: RootContent[],
+  text: string,
+  depth: number = 2,
+): number {
+  return nodes.findIndex(
+    (node) =>
+      node.type === "heading" &&
+      (node as Heading).depth === depth &&
+      extractText(node).toLowerCase().includes(text.toLowerCase()),
+  );
+}
+
+/**
+ * Extract nodes between two headings
+ */
+function extractSectionNodes(
+  nodes: RootContent[],
+  startText: string,
+  depth: number = 2,
+): RootContent[] {
+  const startIdx = findHeadingIndex(nodes, startText, depth);
+  if (startIdx === -1) return [];
+
+  // Find the next heading of same or higher level
+  let endIdx = nodes.length;
+  for (let i = startIdx + 1; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node.type === "heading" && (node as Heading).depth <= depth) {
+      endIdx = i;
+      break;
+    }
+  }
+
+  // Return nodes after the heading (not including the heading itself)
+  return nodes.slice(startIdx + 1, endIdx);
+}
+
+/**
+ * Get the full heading text
+ */
+function getHeadingText(
+  nodes: RootContent[],
+  text: string,
+  depth: number = 2,
+): string {
+  const idx = findHeadingIndex(nodes, text, depth);
+  if (idx === -1) return text;
+  return extractText(nodes[idx]);
+}
+
+/**
+ * Convert mdast nodes to HTML string
+ */
+async function nodesToHtml(nodes: RootContent[]): Promise<string> {
+  if (nodes.length === 0) return "";
+
+  // Create a root node with these children
+  const root: Root = { type: "root", children: nodes };
+
+  const result = await unified()
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .run(root);
+
+  const html = unified()
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .stringify(result as HastRoot);
+
+  return html;
+}
+
+/**
+ * Extract top-level list item titles from an ordered list
+ */
+function extractListItemTitles(list: List): string[] {
+  const titles: string[] = [];
+
+  for (const item of list.children) {
+    if (item.type !== "listItem") continue;
+
+    // Get the first paragraph or text content of the list item
+    // The title is the text before any nested list
+    let title = "";
+    for (const child of item.children) {
+      if (child.type === "list") break; // Stop at nested list
+      if (child.type === "paragraph") {
+        title = extractText(child);
+        break;
+      }
+      // Handle inline text directly in list item
+      title += extractText(child);
+    }
+
+    title = title.split("\n")[0].trim();
+    if (title) {
+      titles.push(title);
+    }
+  }
+
+  return titles;
+}
+
+/**
+ * Find the first ordered list in nodes and extract its structure
+ */
+function findSpecSections(nodes: RootContent[]): SpecSection[] {
   const sections: SpecSection[] = [];
 
-  // The spec uses an ordered list with nested items
-  // Each top-level li starts a new section
-  const olMatch = specContent.match(/<ol[^>]*>([\s\S]*?)<\/ol>/i);
-  if (!olMatch) return sections;
-
-  // Split by top-level list items
-  // We need to handle nested lists carefully
-  const sectionTitles = [
-    "TL;DR",
-    "The Master Branch",
-    "Change Branches",
-    "Pull Requests",
-    "Versioning",
-    "Releases",
-    "Short-Term Release Branches",
-    "Long-term Release Branches",
-    "Bug Fixes & Rollback",
-    "Git Best Practices",
-  ];
-
-  // Find each section by looking for the title pattern
-  for (let i = 0; i < sectionTitles.length; i++) {
-    const title = sectionTitles[i];
-    const id = slugify(title);
-
-    // For the content, we'll just use the title for navigation
-    // The actual content stays in the main specification block
-    sections.push({
-      id: `spec-${id}`,
-      title,
-      content: "", // Content handled inline
-    });
+  for (const node of nodes) {
+    if (node.type === "list" && (node as List).ordered) {
+      const titles = extractListItemTitles(node as List);
+      for (let i = 0; i < titles.length; i++) {
+        const title = titles[i];
+        const clauseNum = i + 1;
+        sections.push({
+          id: `clause-${clauseNum}`,
+          title,
+          content: "",
+          clause: `${clauseNum}.`,
+        });
+      }
+      break; // Only process first ordered list
+    }
   }
 
   return sections;
 }
 
 /**
- * Extract FAQ items from the FAQ section HTML
+ * Add anchor IDs and links to ordered list items recursively.
+ * Injects an invisible anchor link before content for hover-to-reveal behavior.
  */
-function extractFAQItems(faqContent: string): FAQItem[] {
-  const items: FAQItem[] = [];
+function addClauseAnchors(list: List, prefix: string = ""): void {
+  for (let i = 0; i < list.children.length; i++) {
+    const item = list.children[i];
+    if (item.type !== "listItem") continue;
 
-  // Split by h3 headings
-  const h3Pattern = /<h3[^>]*>([\s\S]*?)<\/h3>/gi;
-  let lastIndex = 0;
-  let lastQuestion = "";
-  let lastId = "";
+    // Calculate clause number and ID
+    const clauseNum = prefix ? `${prefix}.${i + 1}` : `${i + 1}`;
+    const clauseId = `clause-${clauseNum.replace(/\./g, "-")}`;
 
-  const matches = [...faqContent.matchAll(h3Pattern)];
+    // Add ID to the list item via hProperties
+    (item as ListItem & { data?: { hProperties?: { id?: string } } }).data = {
+      hProperties: { id: clauseId },
+    };
 
-  for (let i = 0; i < matches.length; i++) {
-    const match = matches[i];
-    const question = match[1].replace(/<[^>]+>/g, "").trim();
-    const id = slugify(question).slice(0, 50);
-
-    if (i > 0 && match.index !== undefined) {
-      // Get content between previous h3 and this one
-      const answer = faqContent.slice(lastIndex, match.index).trim();
-      items.push({
-        id: `faq-${lastId}`,
-        question: lastQuestion,
-        answer,
-      });
+    // Find the first paragraph in the item and prepend an anchor link
+    for (const child of item.children) {
+      if (child.type === "paragraph") {
+        // Create anchor link HTML with clause number text and link icon
+        const linkIcon = generateLinkIconSvg();
+        const anchorHtml: Html = {
+          type: "html",
+          value: `<a href="#${clauseId}" class="clause-link" aria-hidden="true">${linkIcon}${clauseNum}.</a>`,
+        };
+        // Prepend anchor to paragraph children
+        (child as { children: RootContent[] }).children.unshift(
+          anchorHtml as unknown as RootContent,
+        );
+        break;
+      }
     }
 
-    lastQuestion = question;
-    lastId = id;
-    lastIndex = match.index! + match[0].length;
+    // Recursively process nested ordered lists
+    for (const child of item.children) {
+      if (child.type === "list" && (child as List).ordered) {
+        addClauseAnchors(child as List, clauseNum);
+      }
+    }
+  }
+}
+
+/**
+ * Extract FAQ items from FAQ section nodes
+ */
+function extractFAQFromNodes(nodes: RootContent[]): FAQItem[] {
+  const items: FAQItem[] = [];
+  let currentQuestion = "";
+  let currentId = "";
+
+  for (const node of nodes) {
+    if (node.type === "heading" && (node as Heading).depth === 3) {
+      // Save previous FAQ item if we had one
+      if (currentQuestion) {
+        items.push({
+          id: currentId,
+          question: currentQuestion,
+          answer: "", // Placeholder, will be filled later
+        });
+      }
+
+      currentQuestion = extractText(node);
+      currentId = `faq-${slugify(currentQuestion).slice(0, 50)}`;
+    }
   }
 
-  // Don't forget the last FAQ item
-  if (lastQuestion) {
-    const answer = faqContent.slice(lastIndex).trim();
+  // Don't forget the last item
+  if (currentQuestion) {
     items.push({
-      id: `faq-${lastId}`,
-      question: lastQuestion,
-      answer,
+      id: currentId,
+      question: currentQuestion,
+      answer: "",
     });
   }
 
@@ -192,23 +305,28 @@ function extractFAQItems(faqContent: string): FAQItem[] {
 function buildTocItems(parsed: Partial<ParsedSpec>): TocItem[] {
   const items: TocItem[] = [];
 
-  // Main sections
-  if (parsed.introduction) {
-    items.push({ id: "introduction", title: "Introduction", level: 2 });
-  }
-  if (parsed.summary) {
-    items.push({ id: "summary", title: "Summary", level: 2 });
-  }
   if (parsed.terminology) {
-    items.push({ id: "terminology", title: "Terminology", level: 2 });
+    items.push({
+      id: "terminology",
+      title: parsed.terminologyTitle || "Terminology",
+      level: 2,
+    });
   }
   if (parsed.specification) {
-    items.push({ id: "specification", title: "Specification", level: 2 });
+    items.push({
+      id: "specification",
+      title: "Specification",
+      level: 2,
+    });
 
-    // Add spec subsections
     if (parsed.specSections) {
       for (const section of parsed.specSections) {
-        items.push({ id: section.id, title: section.title, level: 3 });
+        items.push({
+          id: section.id,
+          title: section.title,
+          level: 3,
+          clause: section.clause,
+        });
       }
     }
   }
@@ -217,75 +335,102 @@ function buildTocItems(parsed: Partial<ParsedSpec>): TocItem[] {
 }
 
 /**
- * Main parsing function - takes rendered HTML and returns structured content
+ * Main parsing function - takes markdown content and returns structured content
  */
-export function parseSpecContent(html: string, version: string): ParsedSpec {
-  const svgPath = `/spec/${version}.svg`;
+export async function parseSpecContent(
+  markdown: string,
+): Promise<ParsedSpec> {
+  // Parse markdown to AST
+  const tree = unified().use(remarkParse).parse(markdown) as Root;
 
-  // Remove the title (h1) and SVG from the content for parsing
-  let content = html;
+  // Remove title (h1) from the tree - it's displayed separately in the Hero
+  const nodes = tree.children.filter((node) => {
+    if (node.type === "heading" && (node as Heading).depth === 1) return false;
+    return true;
+  });
 
-  // Remove the h1 title
-  content = content.replace(/<h1[^>]*>[\s\S]*?<\/h1>/i, "");
-
-  // Remove the SVG img tag
-  content = content.replace(/<img[^>]*\.svg[^>]*>/i, "");
-
-  // Extract each section
-  const introduction = extractSection(content, "Introduction", [
-    "Summary",
-    "Terminology",
-    "Git Common-Flow",
-    "FAQ",
-    "About",
-    "License",
-  ]);
-
-  const summary = extractSection(content, "Summary", [
-    "Terminology",
-    "Git Common-Flow",
-    "FAQ",
-    "About",
-    "License",
-  ]);
-
-  const terminology = extractSection(content, "Terminology", [
-    "Git Common-Flow",
-    "FAQ",
-    "About",
-    "License",
-  ]);
-
-  const specification = extractSection(
-    content,
+  // Get heading titles
+  const terminologyTitle = getHeadingText(nodes, "Terminology");
+  const specificationTitle = getHeadingText(
+    nodes,
     "Git Common-Flow Specification",
-    ["FAQ", "About", "License"]
   );
 
-  const faqContent = extractSection(content, "FAQ", ["About", "License"]);
+  // Extract section nodes
+  const introNodes = extractSectionNodes(nodes, "Introduction");
+  const summaryNodes = extractSectionNodes(nodes, "Summary");
+  const terminologyNodes = extractSectionNodes(nodes, "Terminology");
+  const specNodes = extractSectionNodes(nodes, "Git Common-Flow Specification");
+  const faqNodes = extractSectionNodes(nodes, "FAQ");
+  const licenseNodes = extractSectionNodes(nodes, "License");
 
-  const about = extractSection(content, "About", ["License"]);
+  // Extract spec sections from the first ordered list
+  const specSections = findSpecSections(specNodes);
 
-  const license = extractSection(content, "License", []);
+  // Add anchor IDs and links to spec list items
+  for (const node of specNodes) {
+    if (node.type === "list" && (node as List).ordered) {
+      addClauseAnchors(node as List);
+      break;
+    }
+  }
 
-  // Parse subsections
-  const specSections = extractSpecSections(specification);
-  const faq = extractFAQItems(faqContent);
+  // Extract FAQ items structure
+  const faqItems = extractFAQFromNodes(faqNodes);
+
+  // Collect FAQ answer nodes for each item
+  const faqAnswerNodes: RootContent[][] = [];
+  let currentAnswerNodes: RootContent[] = [];
+
+  for (const node of faqNodes) {
+    if (node.type === "heading" && (node as Heading).depth === 3) {
+      if (currentAnswerNodes.length > 0) {
+        faqAnswerNodes.push(currentAnswerNodes);
+      }
+      currentAnswerNodes = [];
+    } else {
+      currentAnswerNodes.push(node);
+    }
+  }
+  // Don't forget the last answer
+  if (currentAnswerNodes.length > 0) {
+    faqAnswerNodes.push(currentAnswerNodes);
+  }
+
+  // Convert sections to HTML
+  const [introduction, summary, terminology, specification, license] =
+    await Promise.all([
+      nodesToHtml(introNodes),
+      nodesToHtml(summaryNodes),
+      nodesToHtml(terminologyNodes),
+      nodesToHtml(specNodes),
+      nodesToHtml(licenseNodes),
+    ]);
+
+  // Convert FAQ answers to HTML
+  const faqAnswers = await Promise.all(
+    faqAnswerNodes.map((nodes) => nodesToHtml(nodes)),
+  );
+
+  // Assign FAQ answers
+  const faq = faqItems.map((item, i) => ({
+    ...item,
+    answer: faqAnswers[i] || "",
+  }));
 
   const parsed: ParsedSpec = {
-    svgPath,
     introduction,
     summary,
     terminology,
+    terminologyTitle,
     specification,
+    specificationTitle,
     specSections,
     faq,
-    about,
     license,
     tocItems: [],
   };
 
-  // Build TOC
   parsed.tocItems = buildTocItems(parsed);
 
   return parsed;

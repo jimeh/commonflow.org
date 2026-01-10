@@ -1,49 +1,67 @@
 ---
+import { Icon } from "astro-icon/components";
 import VersionSelector from "./VersionSelector.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 import { config } from "../config";
 
 interface Props {
   version: string;
-  svgPath: string;
+  versions: string[];
+  svgContent?: string | null;
 }
 
-const { version, svgPath } = Astro.props;
+const { version, versions, svgContent } = Astro.props;
+
+const navItems = [
+  { id: "about", label: "About" },
+  { id: "spec", label: "Read the Spec", primary: true },
+  { id: "faq", label: "FAQ" },
+];
+
+const baseClasses = `inline-flex items-center justify-center gap-2
+  px-4 py-2.5 sm:px-6 sm:py-3
+  text-sm sm:text-base font-medium rounded-lg
+  transition-all cursor-pointer`;
+
+const primaryClasses = `bg-sky-600 text-white
+  hover:bg-sky-500 hover:-translate-y-0.5 hover:shadow-md`;
+
+const secondaryClasses = `text-gray-600 dark:text-neutral-400
+  hover:bg-gray-100 hover:text-gray-950
+  dark:hover:bg-neutral-800 dark:hover:text-neutral-50`;
 ---
 
 <section
-  id="hero"
+  id="top"
   class="relative min-h-[75vh] flex flex-col items-center justify-center
-         px-6 py-16 overflow-hidden"
+         px-6 pt-16 pb-24 overflow-hidden"
 >
   <!-- Background gradient/texture -->
   <div
-    class="absolute inset-0 bg-gradient-to-b from-[var(--color-bg-secondary)]
-           to-[var(--color-bg-primary)]
-           dark:from-[var(--color-dark-bg-secondary)]
-           dark:to-[var(--color-dark-bg-primary)]"
+    class="absolute inset-0 bg-gradient-to-b
+           from-gray-100 to-gray-50
+           dark:from-neutral-900 dark:to-neutral-950"
   >
   </div>
 
-  <!-- Subtle grid pattern -->
+  <!-- Subtle grid pattern with fade -->
   <div
-    class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-    style="background-image: linear-gradient(var(--color-text-primary) 1px, transparent 1px),
-           linear-gradient(90deg, var(--color-text-primary) 1px, transparent 1px);
-           background-size: 60px 60px;"
+    class="absolute inset-0 opacity-[0.06] dark:opacity-[0.12]
+           bg-[linear-gradient(theme(colors.gray.950)_1px,transparent_1px),linear-gradient(90deg,theme(colors.gray.950)_1px,transparent_1px)]
+           dark:bg-[linear-gradient(theme(colors.neutral.600)_1px,transparent_1px),linear-gradient(90deg,theme(colors.neutral.600)_1px,transparent_1px)]
+           bg-[size:60px_60px] bg-center
+           [-webkit-mask-image:linear-gradient(to_bottom,black_20%,transparent_80%)]
+           [mask-image:linear-gradient(to_bottom,black_20%,transparent_80%)]"
   >
   </div>
 
   <!-- Top bar with version & theme -->
   <div
-    class="absolute top-0 inset-x-0 flex items-center justify-between
+    class="absolute top-0 inset-x-0 z-20 flex items-center justify-between
            px-6 py-4 animate-fade-in-down"
   >
     <div class="flex items-center gap-3">
-      <VersionSelector
-        currentVersion={version}
-        versions={Array.from(config.versions)}
-      />
+      <VersionSelector currentVersion={version} versions={versions} />
     </div>
     <div class="flex items-center gap-2">
       <ThemeToggle />
@@ -51,20 +69,13 @@ const { version, svgPath } = Astro.props;
         href={config.repoUrl}
         target="_blank"
         rel="noopener noreferrer"
-        class="p-2 rounded-lg text-[var(--color-text-muted)]
-               dark:text-[var(--color-dark-text-muted)]
-               hover:text-[var(--color-text-primary)]
-               dark:hover:text-[var(--color-dark-text-primary)]
-               hover:bg-white/50 dark:hover:bg-white/10
-               transition-colors"
+        class="p-2 rounded-lg transition-colors
+               text-gray-500 dark:text-neutral-500
+               hover:text-gray-950 dark:hover:text-neutral-50
+               hover:bg-white/50 dark:hover:bg-neutral-800/50"
         aria-label="View on GitHub"
       >
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path
-            fill-rule="evenodd"
-            d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-            clip-rule="evenodd"></path>
-        </svg>
+        <Icon name="simple-icons:github" class="w-5 h-5" />
       </a>
     </div>
   </div>
@@ -74,8 +85,7 @@ const { version, svgPath } = Astro.props;
     <!-- Title -->
     <h1
       class="animate-fade-in-up mb-4
-             text-[var(--color-text-primary)]
-             dark:text-[var(--color-dark-text-primary)]"
+             text-gray-950 dark:text-neutral-50"
     >
       Git Common-Flow
     </h1>
@@ -84,42 +94,60 @@ const { version, svgPath } = Astro.props;
     <p
       class="animate-fade-in-up delay-100
              text-lg sm:text-xl max-w-2xl mx-auto mb-8
-             text-[var(--color-text-secondary)]
-             dark:text-[var(--color-dark-text-secondary)]"
+             text-gray-600 dark:text-neutral-400"
     >
       A sensible git workflow for teams who ship
     </p>
 
     <!-- Version badge -->
     <div class="animate-fade-in-up delay-200 mb-10">
-      <span class="version-badge">v{version}</span>
+      <span
+        class="inline-flex items-center px-3 py-1 font-mono text-xs font-medium
+               rounded-full border
+               bg-gray-100 border-gray-200 text-gray-500
+               dark:bg-neutral-800/50 dark:border-neutral-700 dark:text-neutral-400"
+      >
+        v{version}
+      </span>
     </div>
 
     <!-- SVG Diagram -->
-    <div
-      class="animate-fade-in-up delay-300
-             relative mx-auto mb-12 p-4 sm:p-8
-             bg-white dark:bg-[var(--color-dark-bg-secondary)]
-             rounded-2xl shadow-lg dark:shadow-none
-             border border-[var(--color-border)]
-             dark:border-[var(--color-dark-border)]"
-    >
-      <img
-        src={svgPath}
-        alt="Git Common-Flow diagram"
-        class="w-full h-auto max-w-3xl mx-auto
-               dark:invert dark:hue-rotate-180 dark:contrast-90"
-      />
-    </div>
+    {
+      svgContent && (
+        <div
+          class="animate-fade-in-up delay-300
+                 relative mx-auto mb-12 py-8 px-6 sm:py-16 sm:px-14
+                 bg-white dark:bg-neutral-900
+                 rounded-2xl shadow-lg dark:shadow-none
+                 border border-gray-200 dark:border-neutral-800"
+        >
+          <div
+            class="w-full max-w-3xl mx-auto [&>svg]:w-full [&>svg]:h-auto
+                   dark:invert dark:hue-rotate-180 dark:contrast-90"
+            set:html={svgContent}
+          />
+        </div>
+      )
+    }
 
     <!-- Navigation links -->
     <nav
       class="animate-fade-in-up delay-400
-             flex flex-wrap items-center justify-center gap-4"
+             flex flex-nowrap items-center justify-center gap-2 sm:gap-4"
     >
-      <a href="#about" class="btn btn-ghost">About</a>
-      <a href="#spec" class="btn btn-primary">Read the Spec</a>
-      <a href="#faq" class="btn btn-ghost">FAQ</a>
+      {
+        navItems.map((item) => (
+          <a
+            href={`#${item.id}`}
+            class:list={[
+              baseClasses,
+              item.primary ? primaryClasses : secondaryClasses,
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
     </nav>
   </div>
 
@@ -128,22 +156,41 @@ const { version, svgPath } = Astro.props;
     href="#about"
     class="absolute bottom-8 left-1/2 -translate-x-1/2
            animate-fade-in delay-700
-           text-[var(--color-text-muted)]
-           dark:text-[var(--color-dark-text-muted)]
-           hover:text-[var(--color-accent)] transition-colors"
+           text-gray-500 dark:text-neutral-500
+           hover:text-sky-600 transition-colors"
     aria-label="Scroll to content"
   >
-    <svg
-      class="w-6 h-6 animate-bounce-subtle"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-    </svg>
+    <Icon name="heroicons:arrow-down" class="w-6 h-6 animate-bounce-subtle" />
   </a>
 </section>
+
+<script>
+  // Remove animation classes after they complete to prevent re-triggering
+  // on theme toggle.
+  const animationClasses = [
+    "animate-fade-in",
+    "animate-fade-in-up",
+    "animate-fade-in-down",
+    "animate-slide-in-left",
+  ];
+
+  function cleanupAnimations() {
+    const selector = animationClasses.map((c) => `.${c}`).join(", ");
+    const animatedElements = document.querySelectorAll(selector);
+
+    animatedElements.forEach((el) => {
+      el.addEventListener(
+        "animationend",
+        () => {
+          animationClasses.forEach((cls) => el.classList.remove(cls));
+          // Also remove delay classes
+          el.className = el.className.replace(/\bdelay-\d+\b/g, "").trim();
+        },
+        { once: true },
+      );
+    });
+  }
+
+  cleanupAnimations();
+  document.addEventListener("astro:after-swap", cleanupAnimations);
+</script>

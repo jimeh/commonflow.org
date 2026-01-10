@@ -1,77 +1,67 @@
 ---
+import SectionHeader from "./SectionHeader.astro";
+import { config } from "../config";
+
 interface Props {
   introduction: string;
   summary: string;
-  about: string;
   license: string;
 }
 
-const { introduction, summary, about, license } = Astro.props;
+const { introduction, summary, license } = Astro.props;
 ---
 
 <section id="about" class="py-20 sm:py-28">
   <div class="section-container">
     <div class="max-w-3xl mx-auto">
-      <!-- Section header -->
-      <div class="mb-12 text-center">
-        <h2 class="text-3xl sm:text-4xl mb-4">About Common-Flow</h2>
-        <p
-          class="text-lg text-[var(--color-text-secondary)]
-                 dark:text-[var(--color-dark-text-secondary)]"
-        >
-          A practical git workflow that combines the best of GitHub Flow with
-          versioned releases
-        </p>
-      </div>
+      <SectionHeader
+        title="About Common-Flow"
+        subtitle="A practical git workflow that combines the best of GitHub Flow with versioned releases"
+      />
 
       <!-- Introduction -->
-      <div class="prose-spec mb-12">
-        <div class="spec-content" set:html={introduction} />
-      </div>
+      <div class="prose-spec mb-12" set:html={introduction} />
 
       <!-- Summary as feature cards -->
       <div class="mb-16">
         <h3
           class="text-xl font-display font-semibold mb-6
-                 text-[var(--color-text-primary)]
-                 dark:text-[var(--color-dark-text-primary)]"
+                 text-gray-950 dark:text-neutral-50"
         >
           Key Principles
         </h3>
-        <div class="spec-content prose-spec" set:html={summary} />
+        <div class="prose-spec" set:html={summary} />
       </div>
 
-      <!-- Author & License -->
-      <div
-        class="pt-8 border-t border-[var(--color-border)]
-               dark:border-[var(--color-dark-border)]"
-      >
+      <!-- Feedback & License -->
+      <div class="pt-8 border-t border-gray-200 dark:border-neutral-800">
         <div class="grid sm:grid-cols-2 gap-8">
           <div>
             <h4
               class="text-sm font-semibold uppercase tracking-wider mb-3
-                     text-[var(--color-text-muted)]
-                     dark:text-[var(--color-dark-text-muted)]"
+                     text-gray-500 dark:text-neutral-500"
             >
-              Author
+              Feedback
             </h4>
-            <div
-              class="spec-content text-[var(--color-text-secondary)]
-                     dark:text-[var(--color-dark-text-secondary)]"
-              set:html={about}
-            />
+            <p class="text-gray-600 dark:text-neutral-400">
+              Please{" "}
+              <a
+                href={`${config.repoUrl}/issues`}
+                class="text-sky-600 hover:text-sky-400"
+                target="_blank"
+                rel="noopener noreferrer">open an issue on GitHub</a
+              >.
+            </p>
           </div>
           <div>
             <h4
               class="text-sm font-semibold uppercase tracking-wider mb-3
-                     text-[var(--color-text-muted)]
-                     dark:text-[var(--color-dark-text-muted)]"
+                     text-gray-500 dark:text-neutral-500"
             >
               License
             </h4>
             <div
-              class="spec-content text-[var(--color-text-secondary)]
-                     dark:text-[var(--color-dark-text-secondary)]"
+              class="text-gray-600 dark:text-neutral-400"
               set:html={license}
             />
           </div>
@@ -80,17 +70,3 @@ const { introduction, summary, about, license } = Astro.props;
     </div>
   </div>
 </section>
-
-<style>
-  .spec-content :global(p:last-child) {
-    margin-bottom: 0;
-  }
-
-  .spec-content :global(a) {
-    color: var(--color-accent);
-  }
-
-  .spec-content :global(a:hover) {
-    color: var(--color-accent-light);
-  }
-</style>

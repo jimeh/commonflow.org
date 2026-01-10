@@ -1,0 +1,518 @@
+---
+import { getCollection } from "astro:content";
+import { Icon } from "astro-icon/components";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { createHighlighter } from "shiki";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeStringify from "rehype-stringify";
+import { icons as heroicons } from "@iconify-json/heroicons";
+import { getIconData, iconToSVG } from "@iconify/utils";
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ThemeToggle from "../../../components/ThemeToggle.astro";
+import { config } from "../../../config";
+
+// Get the link icon SVG from heroicons for use in anchor links
+const linkIconData = getIconData(heroicons, "link-20-solid");
+const linkIconSvg = linkIconData ? iconToSVG(linkIconData) : null;
+
+// Parse the icon body into hast nodes for rehype
+function parseIconBody(body: string): import("hast").ElementContent[] {
+  // Simple regex-based parser for SVG path/g elements
+  const elements: import("hast").ElementContent[] = [];
+  const tagRegex = /<(\w+)([^>]*)(?:\/>|>([\s\S]*?)<\/\1>)/g;
+  let match;
+
+  while ((match = tagRegex.exec(body)) !== null) {
+    const [, tagName, attrs, children] = match;
+    const properties: Record<string, string> = {};
+
+    // Parse attributes
+    const attrRegex = /(\w+(?:-\w+)*)="([^"]*)"/g;
+    let attrMatch;
+    while ((attrMatch = attrRegex.exec(attrs)) !== null) {
+      properties[attrMatch[1]] = attrMatch[2];
+    }
+
+    elements.push({
+      type: "element",
+      tagName,
+      properties,
+      children: children ? parseIconBody(children) : [],
+    });
+  }
+
+  return elements;
+}
+
+export async function getStaticPaths() {
+  const specs = await getCollection("spec");
+  return specs.map((spec) => ({
+    params: { version: spec.data.version },
+    props: { spec },
+  }));
+}
+
+const { spec } = Astro.props;
+const version = spec.data.version;
+
+// Read the markdown file
+const filePath = path.join(process.cwd(), "src/content/spec", `${version}.md`);
+const content = fs.readFileSync(filePath, "utf-8");
+
+// Remove frontmatter
+const markdown = content.replace(/^---[\s\S]*?---\n/, "");
+
+// Create syntax highlighter for code view
+const highlighter = await createHighlighter({
+  themes: ["github-light", "github-dark"],
+  langs: ["markdown"],
+});
+
+const highlightedHtml = highlighter.codeToHtml(markdown, {
+  lang: "markdown",
+  themes: {
+    light: "github-light",
+    dark: "github-dark",
+  },
+});
+
+// Build the anchor link icon content from the heroicons data
+const anchorIconContent = linkIconSvg
+  ? {
+      type: "element" as const,
+      tagName: "svg",
+      properties: {
+        className: ["anchor-icon"],
+        viewBox: `0 0 ${linkIconSvg.attributes.width} ${linkIconSvg.attributes.height}`,
+        fill: "currentColor",
+        "aria-hidden": "true",
+      },
+      children: parseIconBody(linkIconSvg.body),
+    }
+  : { type: "text" as const, value: "#" };
+
+// Render markdown to HTML for preview view
+const previewHtml = await unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  .use(rehypeSlug)
+  .use(rehypeAutolinkHeadings, {
+    behavior: "append",
+    properties: {
+      className: ["anchor-link"],
+      ariaLabel: "Link to this section",
+    },
+    content: anchorIconContent,
+  })
+  .use(rehypeStringify)
+  .process(markdown)
+  .then((file) => String(file));
+---
+
+<BaseLayout title={`${spec.data.title} - Markdown`}>
+  <!-- Header -->
+  <header
+    class="sticky top-0 z-50 border-b
+           border-gray-200 dark:border-neutral-800
+           backdrop-blur-xl bg-gray-50/85 dark:bg-neutral-950/85"
+  >
+    <div
+      class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center
+             justify-between"
+    >
+      <!-- Back link and title -->
+      <div class="flex items-center gap-4">
+        <a
+          href={`/spec/${version}`}
+          class="inline-flex items-center gap-1.5 text-sm font-medium
+                 text-gray-600 dark:text-neutral-400
+                 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+        >
+          <Icon name="heroicons:arrow-left" class="w-4 h-4" />
+          <span class="hidden sm:inline">Back to Spec</span>
+        </a>
+        <span class="hidden sm:inline text-gray-300 dark:text-neutral-700"
+          >|</span
+        >
+        <span class="font-display font-bold text-lg tracking-tight">
+          Markdown
+        </span>
+        <span
+          class="px-2 py-0.5 text-xs font-semibold rounded-full
+                 bg-sky-100 text-sky-700
+                 dark:bg-sky-900/50 dark:text-sky-300"
+        >
+          v{version}
+        </span>
+      </div>
+
+      <!-- Right side: Theme, GitHub -->
+      <div class="flex items-center gap-2">
+        <ThemeToggle />
+
+        <a
+          href={config.repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="p-2 rounded-lg transition-colors
+                 text-gray-500 dark:text-neutral-500
+                 hover:text-gray-950 dark:hover:text-neutral-50
+                 hover:bg-gray-100 dark:hover:bg-neutral-800"
+          aria-label="View on GitHub"
+        >
+          <Icon name="simple-icons:github" class="w-5 h-5" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <div class="relative">
+      <!-- Hidden raw text for copying -->
+      <div id="markdown-raw" class="hidden">{markdown}</div>
+      <!-- Filename heading and actions -->
+      <div class="flex flex-col items-center mb-6">
+        <h1
+          class="font-mono font-semibold text-sm sm:text-base
+                 text-gray-700 dark:text-neutral-300
+                 max-w-full overflow-hidden text-ellipsis
+                 whitespace-nowrap [direction:rtl] sm:[direction:ltr]"
+        >
+          git-common-flow-v{version}.md
+        </h1>
+        <div
+          class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mt-3
+                 w-full sm:w-auto"
+        >
+          <!-- Separator (hidden on mobile) -->
+          <span
+            class="hidden sm:inline text-gray-300 dark:text-neutral-700
+                   order-2"
+            >|</span
+          >
+
+          <!-- Copy and Download buttons -->
+          <div class="flex items-center gap-3 order-1 sm:order-3">
+            <!-- Copy button -->
+            <div class="relative">
+              <button
+                id="copy-btn"
+                type="button"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
+                       font-medium rounded-lg transition-colors cursor-pointer
+                       text-gray-600 dark:text-neutral-400
+                       hover:bg-gray-100 hover:text-gray-950
+                       dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+              >
+                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+                <span data-copy-text>Copy</span>
+              </button>
+              <!-- Mobile tooltip -->
+              <div
+                id="copy-tooltip"
+                class="sm:hidden absolute left-1/2 -translate-x-1/2 top-full
+                       mt-2 px-2 py-1 text-xs font-medium whitespace-nowrap
+                       rounded-md shadow-sm bg-gray-900 text-white
+                       dark:bg-white dark:text-gray-900 opacity-0
+                       pointer-events-none transition-opacity duration-200"
+              >
+                Copied!
+              </div>
+            </div>
+
+            <!-- Download button -->
+            <button
+              id="download-btn"
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
+                     font-medium rounded-lg transition-colors cursor-pointer
+                     text-gray-600 dark:text-neutral-400
+                     hover:bg-gray-100 hover:text-gray-950
+                     dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+              data-filename={`git-common-flow-v${version}.md`}
+            >
+              <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
+              <span>Download</span>
+            </button>
+          </div>
+
+          <!-- Code/Preview toggle -->
+          <div
+            id="toggle-container"
+            class="relative inline-flex rounded-lg p-0.5 order-2 sm:order-1
+                   mt-2 sm:mt-0 bg-gray-100 dark:bg-neutral-800"
+          >
+            <!-- Sliding indicator -->
+            <div
+              id="toggle-indicator"
+              class="absolute top-0.5 h-[calc(100%-4px)] rounded-md
+                     bg-white dark:bg-neutral-700 shadow-sm
+                     transition-all duration-200 ease-out"
+            >
+            </div>
+            <button
+              id="toggle-preview"
+              type="button"
+              class="relative z-10 inline-flex items-center gap-1.5 px-3 py-1
+                     text-sm font-medium rounded-md cursor-pointer
+                     transition-colors duration-200
+                     text-gray-900 dark:text-neutral-100"
+              aria-pressed="true"
+            >
+              <Icon name="heroicons:eye" class="w-4 h-4" />
+              Preview
+            </button>
+            <button
+              id="toggle-code"
+              type="button"
+              class="relative z-10 inline-flex items-center gap-1.5 px-3 py-1
+                     text-sm font-medium rounded-md cursor-pointer
+                     transition-colors duration-200
+                     text-gray-600 dark:text-neutral-400
+                     hover:text-gray-900 dark:hover:text-neutral-200"
+              aria-pressed="false"
+            >
+              <Icon name="heroicons:code-bracket" class="w-4 h-4" />
+              Code
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Code view (hidden by default) -->
+      <div
+        id="code-view"
+        class="hidden [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:p-6
+               [&_pre]:text-sm [&_pre]:leading-relaxed
+               [&_pre]:border [&_pre]:border-gray-200
+               dark:[&_pre]:border-neutral-800"
+        set:html={highlightedHtml}
+      />
+
+      <!-- Preview view (visible by default) -->
+      <div
+        id="preview-view"
+        class="prose prose-slate dark:prose-invert max-w-none
+               rounded-xl p-6 border border-gray-200
+               dark:border-neutral-800 bg-white dark:bg-neutral-900"
+        set:html={previewHtml}
+      />
+    </div>
+  </main>
+</BaseLayout>
+
+<style is:global>
+  /* Shiki dual theme support - override inline styles in dark mode */
+  .dark .shiki {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+
+  .dark .shiki span {
+    color: var(--shiki-dark) !important;
+  }
+
+  /* Preview anchor links */
+  #preview-view :is(h1, h2, h3, h4, h5, h6) {
+    overflow: visible;
+  }
+
+  #preview-view .anchor-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    vertical-align: middle;
+  }
+
+  #preview-view :is(h1, h2, h3, h4, h5, h6):hover .anchor-link {
+    opacity: 1;
+  }
+
+  #preview-view .anchor-link:hover {
+    opacity: 1;
+  }
+
+  #preview-view .anchor-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: var(--color-slate-400);
+  }
+
+  #preview-view .anchor-link:hover .anchor-icon {
+    color: var(--color-sky-500);
+  }
+
+  .dark #preview-view .anchor-icon {
+    color: var(--color-neutral-500);
+  }
+
+  .dark #preview-view .anchor-link:hover .anchor-icon {
+    color: var(--color-sky-400);
+  }
+</style>
+
+<script>
+  function initPage() {
+    const copyBtn = document.getElementById("copy-btn");
+    const downloadBtn = document.getElementById("download-btn");
+    const rawContent = document.getElementById("markdown-raw");
+    const copyText = copyBtn?.querySelector("[data-copy-text]");
+    const copyTooltip = document.getElementById("copy-tooltip");
+
+    const toggleContainer = document.getElementById("toggle-container");
+    const toggleCode = document.getElementById("toggle-code");
+    const togglePreview = document.getElementById("toggle-preview");
+    const toggleIndicator = document.getElementById("toggle-indicator");
+    const codeView = document.getElementById("code-view");
+    const previewView = document.getElementById("preview-view");
+
+    if (!rawContent) return;
+
+    // Text color classes for active/inactive states
+    const activeTextClasses = ["text-gray-900", "dark:text-neutral-100"];
+    const inactiveTextClasses = [
+      "text-gray-600",
+      "dark:text-neutral-400",
+      "hover:text-gray-900",
+      "dark:hover:text-neutral-200",
+    ];
+
+    function updateIndicator(button: HTMLElement) {
+      if (!toggleIndicator || !toggleContainer) return;
+
+      const containerRect = toggleContainer.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+
+      // Calculate position relative to container (accounting for container padding)
+      const left = buttonRect.left - containerRect.left;
+
+      toggleIndicator.style.left = `${left}px`;
+      toggleIndicator.style.width = `${buttonRect.width}px`;
+    }
+
+    function setActiveToggle(isCode: boolean) {
+      if (
+        !toggleCode ||
+        !togglePreview ||
+        !toggleIndicator ||
+        !codeView ||
+        !previewView
+      )
+        return;
+
+      if (isCode) {
+        // Show code, hide preview
+        codeView.classList.remove("hidden");
+        previewView.classList.add("hidden");
+
+        // Update indicator position and size
+        updateIndicator(toggleCode);
+
+        // Update text colors
+        toggleCode.classList.add(...activeTextClasses);
+        toggleCode.classList.remove(...inactiveTextClasses);
+        toggleCode.setAttribute("aria-pressed", "true");
+
+        togglePreview.classList.remove(...activeTextClasses);
+        togglePreview.classList.add(...inactiveTextClasses);
+        togglePreview.setAttribute("aria-pressed", "false");
+      } else {
+        // Show preview, hide code
+        codeView.classList.add("hidden");
+        previewView.classList.remove("hidden");
+
+        // Update indicator position and size
+        updateIndicator(togglePreview);
+
+        // Update text colors
+        togglePreview.classList.add(...activeTextClasses);
+        togglePreview.classList.remove(...inactiveTextClasses);
+        togglePreview.setAttribute("aria-pressed", "true");
+
+        toggleCode.classList.remove(...activeTextClasses);
+        toggleCode.classList.add(...inactiveTextClasses);
+        toggleCode.setAttribute("aria-pressed", "false");
+      }
+    }
+
+    // Initialize indicator position on load
+    if (togglePreview) {
+      updateIndicator(togglePreview);
+    }
+
+    // Toggle event listeners
+    toggleCode?.addEventListener("click", () => setActiveToggle(true));
+    togglePreview?.addEventListener("click", () => setActiveToggle(false));
+
+    function showCopiedFeedback() {
+      // Desktop: change button text
+      if (copyText) {
+        copyText.textContent = "Copied!";
+        setTimeout(() => {
+          copyText.textContent = "Copy";
+        }, 2000);
+      }
+      // Mobile: show tooltip
+      if (copyTooltip) {
+        copyTooltip.classList.remove("opacity-0");
+        copyTooltip.classList.add("opacity-100");
+        setTimeout(() => {
+          copyTooltip.classList.remove("opacity-100");
+          copyTooltip.classList.add("opacity-0");
+        }, 2000);
+      }
+    }
+
+    // Copy button
+    if (copyBtn) {
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(rawContent.textContent || "");
+          showCopiedFeedback();
+        } catch {
+          // Fallback for older browsers
+          const textarea = document.createElement("textarea");
+          textarea.value = rawContent.textContent || "";
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textarea);
+          showCopiedFeedback();
+        }
+      });
+    }
+
+    // Download button
+    if (downloadBtn) {
+      downloadBtn.addEventListener("click", () => {
+        const filename = downloadBtn.dataset.filename || "common-flow.md";
+        const content = rawContent.textContent || "";
+        const blob = new Blob([content], { type: "text/markdown" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+  }
+
+  initPage();
+  document.addEventListener("astro:after-swap", initPage);
+</script>

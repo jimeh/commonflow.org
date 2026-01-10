@@ -1,4 +1,6 @@
 ---
+import { Icon } from "astro-icon/components";
+import TocLink from "./TocLink.astro";
 import type { TocItem } from "../utils/parseSpecContent";
 
 interface Props {
@@ -12,29 +14,16 @@ const { items } = Astro.props;
   id="spec-sidebar"
   class="hidden lg:block lg:sticky lg:top-24 lg:self-start
          lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto
-         lg:pr-8 lg:mr-8 lg:border-r border-[var(--color-border)]
-         dark:border-[var(--color-dark-border)]"
+         lg:pr-8 lg:mr-8 lg:border-r border-gray-200 dark:border-neutral-800"
 >
   <nav class="space-y-1 py-2">
     <div
       class="text-xs font-semibold uppercase tracking-wider mb-4
-             text-[var(--color-text-muted)]
-             dark:text-[var(--color-dark-text-muted)]"
+             text-gray-500 dark:text-neutral-500"
     >
-      On This Page
+      Table of Contents
     </div>
-    {
-      items.map((item) => (
-        <a
-          href={`#${item.id}`}
-          class={`sidebar-link ${item.level === 3 ? "sidebar-link-sub" : ""}`}
-          data-sidebar-link
-          data-section-id={item.id}
-        >
-          {item.title}
-        </a>
-      ))
-    }
+    {items.map((item) => <TocLink item={item} trackActive />)}
   </nav>
 </aside>
 
@@ -43,19 +32,13 @@ const { items } = Astro.props;
   id="spec-toc-toggle"
   class="lg:hidden fixed bottom-6 right-6 z-40
          w-12 h-12 rounded-full shadow-lg
-         bg-[var(--color-accent)] text-white
+         bg-sky-600 text-white
          flex items-center justify-center
-         hover:bg-[var(--color-accent-light)]
+         hover:bg-sky-500
          transition-all duration-200"
   aria-label="Jump to section"
 >
-  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M4 6h16M4 12h16M4 18h7"></path>
-  </svg>
+  <Icon name="heroicons:bars-3-bottom-left" class="w-5 h-5" />
 </button>
 
 <!-- Mobile TOC drawer -->
@@ -70,90 +53,39 @@ const { items } = Astro.props;
   <!-- Drawer -->
   <div
     class="absolute bottom-0 inset-x-0 max-h-[70vh] overflow-y-auto
-           bg-[var(--color-bg-primary)] dark:bg-[var(--color-dark-bg-primary)]
+           bg-gray-50 dark:bg-neutral-950
            rounded-t-2xl shadow-xl p-6"
   >
     <div class="flex items-center justify-between mb-4">
       <span
         class="text-sm font-semibold uppercase tracking-wider
-               text-[var(--color-text-muted)]
-               dark:text-[var(--color-dark-text-muted)]"
+               text-gray-500 dark:text-neutral-500"
       >
         Jump to Section
       </span>
       <button
-        class="p-2 rounded-lg hover:bg-[var(--color-bg-secondary)]
-               dark:hover:bg-[var(--color-dark-bg-secondary)]"
+        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800"
         data-toc-close
         aria-label="Close"
       >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+        <Icon name="heroicons:x-mark" class="w-5 h-5" />
       </button>
     </div>
 
     <nav class="space-y-1">
-      {
-        items.map((item) => (
-          <a
-            href={`#${item.id}`}
-            class={`sidebar-link ${item.level === 3 ? "sidebar-link-sub" : ""}`}
-            data-toc-link
-          >
-            {item.title}
-          </a>
-        ))
-      }
+      {items.map((item) => <TocLink item={item} />)}
     </nav>
   </div>
 </div>
 
 <script>
+  import { initActiveSectionTracker } from "../scripts/activeSectionTracker";
+
   function initSpecSidebar() {
-    // Active section tracking
-    const sidebarLinks = document.querySelectorAll("[data-sidebar-link]");
-    const sections = new Map<string, Element>();
-
-    sidebarLinks.forEach((link) => {
-      const id = link.getAttribute("data-section-id");
-      if (id) {
-        const section = document.getElementById(id);
-        if (section) {
-          sections.set(id, section);
-        }
-      }
+    // Active section tracking for sidebar links
+    initActiveSectionTracker({
+      linkSelector: "[data-sidebar-link]",
     });
-
-    // Intersection Observer for active state
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
-            sidebarLinks.forEach((link) => {
-              const linkId = link.getAttribute("data-section-id");
-              link.classList.toggle("active", linkId === id);
-            });
-          }
-        });
-      },
-      {
-        rootMargin: "-20% 0% -60% 0%",
-        threshold: 0,
-      }
-    );
-
-    sections.forEach((section) => observer.observe(section));
 
     // Mobile TOC drawer
     const toggleBtn = document.getElementById("spec-toc-toggle");
@@ -186,7 +118,7 @@ const { items } = Astro.props;
         ([entry]) => {
           toggleBtn.classList.toggle("hidden", !entry.isIntersecting);
         },
-        { threshold: 0 }
+        { threshold: 0 },
       );
       specObserver.observe(specSection);
     }
@@ -198,22 +130,3 @@ const { items } = Astro.props;
   // Re-initialize on Astro page transitions
   document.addEventListener("astro:after-swap", initSpecSidebar);
 </script>
-
-<style>
-  #spec-sidebar::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  #spec-sidebar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  #spec-sidebar::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 2px;
-  }
-
-  :global(.dark) #spec-sidebar::-webkit-scrollbar-thumb {
-    background: var(--color-dark-border);
-  }
-</style>
