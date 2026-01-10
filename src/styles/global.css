@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Colors */
+  --color-sidebar: #191818;
+  --color-sidebar-hover: #333;
+  --color-accent: #1f8dd6;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #777;
+  --color-text-muted: #999;
+  --color-bg-primary: #fdfdfd;
+  --color-bg-code: #f6f8fa;
+  --color-bg-code-inline: rgba(27, 31, 35, 0.05);
+  --color-border: #333;
+
+  /* Dark mode colors */
+  --color-dark-text-primary: #e5e5e5;
+  --color-dark-text-secondary: #a0a0a0;
+  --color-dark-bg-primary: #0d0d0d;
+  --color-dark-bg-code: #1a1a1a;
+  --color-dark-bg-code-inline: rgba(255, 255, 255, 0.1);
+
+  /* Fonts */
+  --font-sans: "Open Sans", Helvetica, Arial, sans-serif;
+  --font-heading: "Open Sans Condensed", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+
+  /* Sizing */
+  --sidebar-width: 150px;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+  }
+
+  .dark body {
+    color: var(--color-dark-text-primary);
+    background-color: var(--color-dark-bg-primary);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: #333;
+  }
+
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: #e5e5e5;
+  }
+
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.2;
+  }
+
+  /* Nested list styling */
+  ol ol,
+  ul ol {
+    list-style-type: lower-roman;
+  }
+
+  ul ul ol,
+  ul ol ol,
+  ol ul ol,
+  ol ol ol {
+    list-style-type: lower-alpha;
+  }
+
+  a {
+    word-break: break-word;
+  }
+
+  code {
+    background-color: var(--color-bg-code-inline);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 85%;
+    margin: 0;
+    padding: 0.3em 0.4em 0.1em 0.4em;
+  }
+
+  .dark code {
+    background-color: var(--color-dark-bg-code-inline);
+  }
+
+  pre {
+    background-color: var(--color-bg-code);
+    border-radius: 3px;
+    line-height: 1.45;
+    padding: 16px;
+  }
+
+  .dark pre {
+    background-color: var(--color-dark-bg-code);
+  }
+
+  pre > code {
+    background-color: transparent !important;
+    border-radius: 0;
+    font-size: 90%;
+    padding: 0;
+  }
+}
+
+/* Layout transitions */
+@layer components {
+  #layout,
+  #menu,
+  .menu-link {
+    transition: all 0.2s ease-out;
+  }
+}

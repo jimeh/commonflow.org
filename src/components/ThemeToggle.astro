@@ -1,0 +1,102 @@
+---
+// Theme toggle component - sun/moon icon to switch between light and dark mode
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  class="p-2 text-[color:var(--color-text-muted)] hover:text-white
+         transition-colors duration-200"
+  aria-label="Toggle dark mode"
+>
+  <!-- Sun icon (shown in dark mode) -->
+  <svg
+    id="sun-icon"
+    class="hidden w-6 h-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343
+         6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16
+         12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+  </svg>
+  <!-- Moon icon (shown in light mode) -->
+  <svg
+    id="moon-icon"
+    class="w-6 h-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003
+         9.003 0 008.354-5.646z"></path>
+  </svg>
+</button>
+
+<script>
+  function initTheme() {
+    const toggle = document.getElementById("theme-toggle");
+    const sunIcon = document.getElementById("sun-icon");
+    const moonIcon = document.getElementById("moon-icon");
+
+    function updateIcons(isDark: boolean) {
+      if (isDark) {
+        sunIcon?.classList.remove("hidden");
+        moonIcon?.classList.add("hidden");
+      } else {
+        sunIcon?.classList.add("hidden");
+        moonIcon?.classList.remove("hidden");
+      }
+    }
+
+    function getTheme(): "dark" | "light" {
+      const stored = localStorage.getItem("theme");
+      if (stored === "dark" || stored === "light") {
+        return stored;
+      }
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+
+    function setTheme(theme: "dark" | "light") {
+      localStorage.setItem("theme", theme);
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      updateIcons(theme === "dark");
+    }
+
+    // Initialize
+    const currentTheme = getTheme();
+    setTheme(currentTheme);
+
+    // Toggle handler
+    toggle?.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      setTheme(isDark ? "light" : "dark");
+    });
+
+    // Listen for system preference changes
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => {
+        if (!localStorage.getItem("theme")) {
+          setTheme(e.matches ? "dark" : "light");
+        }
+      });
+  }
+
+  // Run on initial load
+  initTheme();
+
+  // Re-run on Astro page transitions
+  document.addEventListener("astro:after-swap", initTheme);
+</script>

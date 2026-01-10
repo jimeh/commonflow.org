@@ -1,0 +1,6 @@
+---
+import { config } from "../config";
+
+// Redirect to current version
+return Astro.redirect(`/spec/${config.currentVersion}`);
+---

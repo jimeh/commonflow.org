@@ -1,0 +1,102 @@
+---
+import { getCollection, render } from "astro:content";
+import Default from "../../layouts/Default.astro";
+
+export async function getStaticPaths() {
+  const specs = await getCollection("spec");
+  return specs.map((spec) => ({
+    params: { version: spec.data.version },
+    props: { spec },
+  }));
+}
+
+const { spec } = Astro.props;
+const { Content } = await render(spec);
+---
+
+<Default title={spec.data.title} version={spec.data.version}>
+  <article class="spec-content">
+    <Content />
+  </article>
+</Default>
+
+<style is:global>
+  .spec-content {
+    /* Prose-like styling for spec content */
+  }
+
+  .spec-content h1 {
+    margin-bottom: 0.5em;
+  }
+
+  .spec-content h2 {
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eee;
+  }
+
+  .dark .spec-content h2 {
+    border-bottom-color: #333;
+  }
+
+  .spec-content h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .spec-content p {
+    margin-bottom: 1em;
+  }
+
+  .spec-content ul,
+  .spec-content ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+
+  .spec-content li {
+    margin-bottom: 0.25em;
+  }
+
+  .spec-content a {
+    color: #1f8dd6;
+    text-decoration: none;
+  }
+
+  .spec-content a:hover {
+    text-decoration: underline;
+  }
+
+  .dark .spec-content a {
+    color: #4da6e8;
+  }
+
+  .spec-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+  }
+
+  .spec-content blockquote {
+    margin: 1em 0;
+    padding-left: 1em;
+    border-left: 4px solid #ddd;
+    color: #666;
+  }
+
+  .dark .spec-content blockquote {
+    border-left-color: #444;
+    color: #aaa;
+  }
+
+  .spec-content hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid #eee;
+  }
+
+  .dark .spec-content hr {
+    border-top-color: #333;
+  }
+</style>
