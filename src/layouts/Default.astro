@@ -44,19 +44,6 @@ const fullTitle = title === config.title ? title : `${title} | ${config.title}`;
       rel="stylesheet"
     />
 
-    <!-- Prevent flash of wrong theme -->
-    <script is:inline>
-      (function () {
-        const theme = localStorage.getItem("theme");
-        if (
-          theme === "dark" ||
-          (!theme &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-          document.documentElement.classList.add("dark");
-        }
-      })();
-    </script>
   </head>
   <body>
     <div id="layout">
