@@ -149,7 +149,7 @@ html {
     background-color: theme(colors.neutral.900);
   }
 
-  pre > code {
+  pre>code {
     background-color: transparent !important;
     padding: 0;
     font-size: 0.875rem;
@@ -279,6 +279,7 @@ html {
 }
 
 @keyframes bounce-subtle {
+
   0%,
   100% {
     transform: translateY(0);
@@ -349,6 +350,7 @@ html {
 
 /* Component styles */
 @layer components {
+
   /* Section container - uses CSS vars, keep here */
   .section-container {
     max-width: calc(var(--content-max-width) + var(--sidebar-width) + 4rem);
@@ -398,11 +400,11 @@ html {
   }
 
   .prose-spec strong {
-    color: theme(colors.slate.950);
+    color: theme(colors.neutral.700);
   }
 
   .dark .prose-spec strong {
-    color: theme(colors.neutral.50);
+    color: theme(colors.neutral.300);
   }
 
   .prose-spec li {
@@ -420,13 +422,13 @@ html {
     list-style: none;
   }
 
-  .prose-spec ol > li {
+  .prose-spec ol>li {
     counter-increment: item;
     position: relative;
     margin-bottom: 0.5rem;
   }
 
-  .prose-spec ol > li::before {
+  .prose-spec ol>li::before {
     content: counters(item, ".") ".";
     position: absolute;
     left: -2.5rem;
@@ -436,12 +438,12 @@ html {
     color: theme(colors.slate.400);
   }
 
-  .dark .prose-spec ol > li::before {
+  .dark .prose-spec ol>li::before {
     color: theme(colors.neutral.500);
   }
 
   /* Clause highlight effect using ::after pseudo-element */
-  .prose-spec ol > li::after {
+  .prose-spec ol>li::after {
     content: "";
     position: absolute;
     inset: -0.25rem -0.5rem;
@@ -452,11 +454,11 @@ html {
     z-index: -1;
   }
 
-  .prose-spec ol > li.clause-highlight::after {
+  .prose-spec ol>li.clause-highlight::after {
     animation: clause-highlight-pulse 2s ease-out forwards;
   }
 
-  .dark .prose-spec ol > li.clause-highlight::after {
+  .dark .prose-spec ol>li.clause-highlight::after {
     animation: clause-highlight-pulse-dark 2s ease-out forwards;
   }
 
@@ -487,19 +489,19 @@ html {
   }
 
   /* On hover: show anchor link, hide CSS counter */
-  .prose-spec ol > li:hover:not(:has(ol:hover)) > .clause-link,
-  .prose-spec ol > li:hover:not(:has(ol:hover)) > p > .clause-link,
+  .prose-spec ol>li:hover:not(:has(ol:hover))>.clause-link,
+  .prose-spec ol>li:hover:not(:has(ol:hover))>p>.clause-link,
   .prose-spec .clause-link:hover {
     opacity: 1;
   }
 
-  .prose-spec ol > li:hover:not(:has(ol:hover))::before {
+  .prose-spec ol>li:hover:not(:has(ol:hover))::before {
     opacity: 0;
   }
 
-  /* Orange color on direct hover of the link */
+  /* Hover color for clause anchor link */
   .prose-spec .clause-link:hover {
-    color: theme(colors.orange.500);
+    color: theme(colors.sky.500);
   }
 
   .prose-spec img {
