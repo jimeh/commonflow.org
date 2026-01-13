@@ -3,46 +3,28 @@ import Default from "../layouts/Default.astro";
 ---
 
 <Default title="Page Not Found">
-  <div class="not-found">
-    <h1>404</h1>
-    <p>Page not found.</p>
-    <p>
-      <a href="/">Go to the homepage</a>
+  <div class="text-center">
+    <h1
+      class="text-[8rem] sm:text-[12rem] font-display font-bold leading-none
+             text-[var(--color-border-strong)]
+             dark:text-[var(--color-dark-border-strong)]"
+    >
+      404
+    </h1>
+    <p
+      class="text-xl mb-2 text-[var(--color-text-secondary)]
+             dark:text-[var(--color-dark-text-secondary)]"
+    >
+      Page not found
     </p>
+    <p class="text-[var(--color-text-muted)] dark:text-[var(--color-dark-text-muted)]">
+      The page you're looking for doesn't exist.
+    </p>
+    <a
+      href="/"
+      class="inline-block mt-8 btn btn-primary"
+    >
+      Go to homepage
+    </a>
   </div>
 </Default>
-
-<style>
-  .not-found {
-    text-align: center;
-    padding-top: 4rem;
-  }
-
-  .not-found h1 {
-    font-size: 6rem;
-    margin-bottom: 0.5rem;
-    color: #999;
-  }
-
-  .dark .not-found h1 {
-    color: #666;
-  }
-
-  .not-found p {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-  }
-
-  .not-found a {
-    color: #1f8dd6;
-    text-decoration: none;
-  }
-
-  .not-found a:hover {
-    text-decoration: underline;
-  }
-
-  .dark .not-found a {
-    color: #4da6e8;
-  }
-</style>

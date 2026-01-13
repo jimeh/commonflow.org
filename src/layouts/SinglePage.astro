@@ -1,0 +1,87 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  version: string;
+}
+
+const { title, description, version } = Astro.props;
+
+const defaultDescription =
+  "An attempt to gather a sensible selection of the most common usage " +
+  "patterns of git into a single and concise specification.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description || defaultDescription} />
+    <meta name="author" content="Jim Myhrberg" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta
+      property="og:description"
+      content={description || defaultDescription}
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={`https://commonflow.org/${version}`} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta
+      name="twitter:description"
+      content={description || defaultDescription}
+    />
+
+    <title>{title}</title>
+
+    <!-- Fonts - distinctive choices -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Theme initialization - prevent flash -->
+    <script is:inline>
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (
+          theme === "dark" ||
+          (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <slot />
+
+    <!-- Re-init theme on Astro page transitions -->
+    <script>
+      document.addEventListener("astro:after-swap", () => {
+        const theme = localStorage.getItem("theme");
+        if (
+          theme === "dark" ||
+          (!theme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+---
+interface Props {
+  currentVersion: string;
+  versions: string[];
+}
+
+const { currentVersion, versions } = Astro.props;
+---
+
+<div class="version-selector relative">
+  <select
+    data-version-select
+    class="appearance-none bg-transparent border border-[var(--color-border)]
+           dark:border-[var(--color-dark-border)] rounded-lg px-3 py-1.5
+           pr-8 text-sm font-mono cursor-pointer
+           text-[var(--color-text-secondary)]
+           dark:text-[var(--color-dark-text-secondary)]
+           hover:border-[var(--color-accent)]
+           focus:border-[var(--color-accent)]
+           focus:outline-none transition-colors"
+  >
+    {
+      versions.map((v) => (
+        <option value={v} selected={v === currentVersion}>
+          v{v}
+        </option>
+      ))
+    }
+  </select>
+  <!-- Dropdown arrow -->
+  <svg
+    class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none
+           text-[var(--color-text-muted)] dark:text-[var(--color-dark-text-muted)]"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M19 9l-7 7-7-7"></path>
+  </svg>
+</div>
+
+<script>
+  function initVersionSelectors() {
+    const selects = document.querySelectorAll(
+      "[data-version-select]"
+    ) as NodeListOf<HTMLSelectElement>;
+
+    selects.forEach((select) => {
+      // Avoid adding duplicate listeners
+      if (select.dataset.initialized) return;
+      select.dataset.initialized = "true";
+
+      select.addEventListener("change", (e) => {
+        const target = e.target as HTMLSelectElement;
+        const version = target.value;
+        window.location.href = `/spec/${version}`;
+      });
+    });
+  }
+
+  // Initialize on load
+  initVersionSelectors();
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener("astro:after-swap", initVersionSelectors);
+</script>
+
+<style>
+  select option {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  :global(.dark) select option {
+    background-color: var(--color-dark-bg-primary);
+    color: var(--color-dark-text-primary);
+  }
+</style>

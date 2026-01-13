@@ -1,0 +1,186 @@
+---
+import VersionSelector from "./VersionSelector.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { config } from "../config";
+
+interface Props {
+  version: string;
+}
+
+const { version } = Astro.props;
+---
+
+<header
+  id="site-header"
+  class="fixed top-0 inset-x-0 z-50 glass border-b border-transparent
+         translate-y-[-100%] transition-transform duration-300"
+>
+  <div
+    class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between"
+  >
+    <!-- Logo / Title -->
+    <a
+      href="#hero"
+      class="header-title flex items-center gap-3 no-underline
+             hover:text-[var(--color-accent)] transition-colors"
+    >
+      <span class="font-display font-bold text-lg tracking-tight">
+        Git Common-Flow
+      </span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex items-center gap-1">
+      <a href="#about" class="btn btn-ghost text-sm">About</a>
+      <a href="#spec" class="btn btn-ghost text-sm">Spec</a>
+      <a href="#faq" class="btn btn-ghost text-sm">FAQ</a>
+    </nav>
+
+    <!-- Right side: Version, Theme, GitHub -->
+    <div class="flex items-center gap-3">
+      <VersionSelector
+        currentVersion={version}
+        versions={Array.from(config.versions)}
+      />
+
+      <ThemeToggle />
+
+      <a
+        href={config.repoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="p-2 rounded-lg text-[var(--color-text-muted)]
+               dark:text-[var(--color-dark-text-muted)]
+               hover:text-[var(--color-text-primary)]
+               dark:hover:text-[var(--color-dark-text-primary)]
+               hover:bg-[var(--color-bg-secondary)]
+               dark:hover:bg-[var(--color-dark-bg-secondary)]
+               transition-colors"
+        aria-label="View on GitHub"
+      >
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            fill-rule="evenodd"
+            d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+            clip-rule="evenodd"></path>
+        </svg>
+      </a>
+
+      <!-- Mobile menu button -->
+      <button
+        id="mobile-menu-btn"
+        class="md:hidden p-2 rounded-lg text-[var(--color-text-muted)]
+               dark:text-[var(--color-dark-text-muted)]
+               hover:bg-[var(--color-bg-secondary)]
+               dark:hover:bg-[var(--color-dark-bg-secondary)]"
+        aria-label="Toggle menu"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <nav
+    id="mobile-nav"
+    class="md:hidden hidden border-t border-[var(--color-border)]
+           dark:border-[var(--color-dark-border)]"
+  >
+    <div class="px-4 py-3 space-y-1">
+      <a
+        href="#about"
+        class="block py-2 text-[var(--color-text-secondary)]
+               dark:text-[var(--color-dark-text-secondary)]
+               hover:text-[var(--color-accent)]"
+      >
+        About
+      </a>
+      <a
+        href="#spec"
+        class="block py-2 text-[var(--color-text-secondary)]
+               dark:text-[var(--color-dark-text-secondary)]
+               hover:text-[var(--color-accent)]"
+      >
+        Spec
+      </a>
+      <a
+        href="#faq"
+        class="block py-2 text-[var(--color-text-secondary)]
+               dark:text-[var(--color-dark-text-secondary)]
+               hover:text-[var(--color-accent)]"
+      >
+        FAQ
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  function initHeader() {
+    const header = document.getElementById("site-header");
+    const hero = document.getElementById("hero");
+    const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+    const mobileNav = document.getElementById("mobile-nav");
+
+    if (!header || !hero) return;
+
+    // Show/hide header based on scroll past hero
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          header.classList.add("translate-y-[-100%]");
+          header.classList.remove("border-[var(--color-border)]");
+          header.classList.remove("dark:border-[var(--color-dark-border)]");
+        } else {
+          header.classList.remove("translate-y-[-100%]");
+          header.classList.add("border-[var(--color-border)]");
+          header.classList.add("dark:border-[var(--color-dark-border)]");
+        }
+      },
+      { threshold: 0, rootMargin: "-64px 0px 0px 0px" }
+    );
+
+    observer.observe(hero);
+
+    // Mobile menu toggle
+    if (mobileMenuBtn && mobileNav) {
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileNav.classList.toggle("hidden");
+      });
+
+      // Close menu when clicking a link
+      mobileNav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileNav.classList.add("hidden");
+        });
+      });
+    }
+  }
+
+  // Initialize on load
+  initHeader();
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener("astro:after-swap", initHeader);
+</script>
+
+<style>
+  .header-title {
+    color: var(--color-text-primary);
+  }
+
+  :global(.dark) .header-title {
+    color: var(--color-dark-text-primary);
+  }
+</style>

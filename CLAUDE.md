@@ -12,20 +12,23 @@ that combines GitHub Flow with versioned releases.
 ## Build Commands
 
 ```bash
+# Install tooling (bun) via mise
+mise install
+
 # Install dependencies
-npm install
+bun install
 
 # Development server
-npm run dev
+bun run dev
 
 # Build site (outputs to docs/ directory)
-npm run build
+bun run build
 
 # Preview built site
-npm run preview
+bun run preview
 
 # Update specs from upstream (fetches from github.com/jimeh/common-flow)
-npm run update
+bun run update
 ```
 
 The site is built to `docs/` for GitHub Pages hosting.
@@ -36,6 +39,7 @@ The site is built to `docs/` for GitHub Pages hosting.
 - **Tailwind CSS 4.x** for styling with dark mode support
 - **Content Collections** for spec markdown files
 - **TypeScript** throughout
+- **Bun** as JavaScript runtime and package manager (managed via mise)
 
 ### Key Files
 
@@ -52,5 +56,5 @@ The site is built to `docs/` for GitHub Pages hosting.
 
 1. Add new version to `versions` array in `src/config.ts`
 2. Update `currentVersion` if this is the new default
-3. Run `npm run update` to fetch specs from GitHub
-4. Run `npm run build` to rebuild the site
+3. Run `bun run update` to fetch specs from GitHub
+4. Run `bun run build` to rebuild the site

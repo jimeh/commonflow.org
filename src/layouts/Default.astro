@@ -1,16 +1,13 @@
 ---
 import "../styles/global.css";
 import { config } from "../config";
-import Sidebar from "../components/Sidebar.astro";
-import MenuToggle from "../components/MenuToggle.astro";
 
 interface Props {
   title: string;
   description?: string;
-  version?: string;
 }
 
-const { title, description = config.description, version } = Astro.props;
+const { title, description = config.description } = Astro.props;
 const fullTitle = title === config.title ? title : `${title} | ${config.title}`;
 ---
 
@@ -25,79 +22,29 @@ const fullTitle = title === config.title ? title : `${title} | ${config.title}`;
     <meta name="description" content={description} />
     <meta name="author" content={config.author} />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
-
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300;700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
+    <!-- Prevent flash of wrong theme -->
+    <script is:inline>
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (
+          theme === "dark" ||
+          (!theme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
-  <body>
-    <div id="layout">
-      <MenuToggle />
-      <Sidebar currentVersion={version} />
-
-      <div id="main">
-        <div class="content">
-          <slot />
-        </div>
-      </div>
-    </div>
+  <body class="min-h-screen flex flex-col items-center justify-center p-8">
+    <slot />
   </body>
 </html>
-
-<style>
-  #layout {
-    position: relative;
-    left: 0;
-    padding-left: 0;
-    transition: all 0.2s ease-out;
-  }
-
-  #main {
-    min-height: 100vh;
-  }
-
-  .content {
-    margin: 0 auto;
-    padding: 0 2em;
-    max-width: 800px;
-    margin-bottom: 50px;
-    line-height: 1.6em;
-    padding-top: 80px;
-  }
-
-  /* Desktop layout */
-  @media (min-width: 48em) {
-    #layout {
-      padding-left: 150px;
-      left: 0;
-    }
-
-    .content {
-      padding-left: 2em;
-      padding-right: 2em;
-    }
-  }
-
-  /* Mobile: when menu is active */
-  @media (max-width: 48em) {
-    :global(#layout.active) {
-      position: relative;
-      left: 150px;
-    }
-  }
-</style>
