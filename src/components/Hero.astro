@@ -13,9 +13,9 @@ interface Props {
 const { version, versions, svgContent } = Astro.props;
 
 const navItems = [
-  { id: "about", label: "About" },
+  { id: "about", label: "About", align: "end" },
   { id: "spec", label: "Read the Spec", primary: true },
-  { id: "faq", label: "FAQ" },
+  { id: "faq", label: "FAQ", align: "start" },
 ];
 
 const baseClasses = `inline-flex items-center justify-center gap-2
@@ -29,6 +29,7 @@ const primaryClasses = `bg-sky-600 text-white
 const secondaryClasses = `text-gray-600 dark:text-neutral-400
   hover:bg-gray-100 hover:text-gray-950
   dark:hover:bg-neutral-800 dark:hover:text-neutral-50`;
+
 ---
 
 <section
@@ -133,7 +134,7 @@ const secondaryClasses = `text-gray-600 dark:text-neutral-400
     <!-- Navigation links -->
     <nav
       class="animate-fade-in-up delay-400
-             flex flex-nowrap items-center justify-center gap-2 sm:gap-4"
+             grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4"
     >
       {
         navItems.map((item) => (
@@ -142,6 +143,8 @@ const secondaryClasses = `text-gray-600 dark:text-neutral-400
             class:list={[
               baseClasses,
               item.primary ? primaryClasses : secondaryClasses,
+              item.align === "end" && "justify-self-end",
+              item.align === "start" && "justify-self-start",
             ]}
           >
             {item.label}
