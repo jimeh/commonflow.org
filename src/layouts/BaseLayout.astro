@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { title, description = config.description } = Astro.props;
-const fullTitle = title === config.title ? title : `${title} | ${config.title}`;
+const fullTitle = title.includes(config.title) ? title : `${title} | ${config.title}`;
 const canonicalUrl = Astro.url.href;
 ---
 
