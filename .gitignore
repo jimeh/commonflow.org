@@ -1,5 +1,23 @@
+# Astro
+dist/
+.astro/
+
+# Node
+node_modules/
+
+# Jekyll (legacy, can be removed after full migration)
 _site
 .asset-cache
 .sass-cache
 .jekyll-metadata
+.jekyll-cache
 docs/assets/.sprockets-manifest-*.json
+
+# Editor
+.DS_Store
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*

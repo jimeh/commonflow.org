@@ -1,0 +1,21 @@
+---
+import { getCollection, render } from "astro:content";
+import Default from "../../layouts/Default.astro";
+
+export async function getStaticPaths() {
+  const specs = await getCollection("spec");
+  return specs.map((spec) => ({
+    params: { version: spec.data.version },
+    props: { spec },
+  }));
+}
+
+const { spec } = Astro.props;
+const { Content } = await render(spec);
+---
+
+<Default title={spec.data.title} version={spec.data.version}>
+  <article class="spec-content">
+    <Content />
+  </article>
+</Default>

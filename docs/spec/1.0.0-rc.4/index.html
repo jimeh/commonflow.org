@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en" data-astro-cid-jwirc66j> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="canonical" href="https://commonflow.org/"><title>Git Common-Flow 1.0.0-rc.5 | Git Common Flow</title><meta name="description" content="An attempt to gather a sensible selection of the most common usage patterns of git into a single and concise specification."><meta name="author" content="Jim Myhrberg"><!-- Open Graph --><meta property="og:title" content="Git Common-Flow 1.0.0-rc.5 | Git Common Flow"><meta property="og:description" content="An attempt to gather a sensible selection of the most common usage patterns of git into a single and concise specification."><meta property="og:type" content="website"><meta property="og:url" content="https://commonflow.org/"><!-- Twitter --><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Git Common-Flow 1.0.0-rc.5 | Git Common Flow"><meta name="twitter:description" content="An attempt to gather a sensible selection of the most common usage patterns of git into a single and concise specification."><!-- Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300;700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/index.BMC0NJ9O.css"></head> <body data-astro-cid-jwirc66j> <div id="layout" data-astro-cid-jwirc66j> <a href="#menu" id="menuLink" class="menu-link" data-astro-cid-jyixok4n> <span data-astro-cid-jyixok4n></span> </a>  <script type="module">function c(){const e=document.getElementById("layout"),n=document.getElementById("menu"),t=document.getElementById("menuLink"),s=document.getElementById("main");function i(o){o.preventDefault(),e?.classList.toggle("active"),n?.classList.toggle("active"),t?.classList.toggle("active")}function a(){e?.classList.remove("active"),n?.classList.remove("active"),t?.classList.remove("active")}t?.addEventListener("click",i),s?.addEventListener("click",()=>{e?.classList.contains("active")&&a()})}c();document.addEventListener("astro:after-swap",c);</script> <div id="menu" data-astro-cid-ssfzsv2f> <div class="menu-inner" data-astro-cid-ssfzsv2f> <ul class="menu-list" data-astro-cid-ssfzsv2f> <li class="menu-label" data-astro-cid-ssfzsv2f>Versions:</li> <li class="menu-item selected" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.5" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.5 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.4" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.4 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.3" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.3 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.2" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.2 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.1" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.1 </a> </li> </ul> </div> <div class="links" data-astro-cid-ssfzsv2f> <a href="https://github.com/jimeh/common-flow" aria-label="View on GitHub" class="github-link" data-astro-cid-ssfzsv2f> <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-ssfzsv2f> <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839
+<!DOCTYPE html><html lang="en" data-astro-cid-jwirc66j> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="canonical" href="https://commonflow.org/spec/1.0.0-rc.4/"><title>Git Common-Flow 1.0.0-rc.4 | Git Common Flow</title><meta name="description" content="An attempt to gather a sensible selection of the most common usage patterns of git into a single and concise specification."><meta name="author" content="Jim Myhrberg"><!-- Open Graph --><meta property="og:title" content="Git Common-Flow 1.0.0-rc.4 | Git Common Flow"><meta property="og:description" content="An attempt to gather a sensible selection of the most common usage patterns of git into a single and concise specification."><meta property="og:type" content="website"><meta property="og:url" content="https://commonflow.org/spec/1.0.0-rc.4/"><!-- Twitter --><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Git Common-Flow 1.0.0-rc.4 | Git Common Flow"><meta name="twitter:description" content="An attempt to gather a sensible selection of the most common usage patterns of git into a single and concise specification."><!-- Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300;700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/index.BMC0NJ9O.css"></head> <body data-astro-cid-jwirc66j> <div id="layout" data-astro-cid-jwirc66j> <a href="#menu" id="menuLink" class="menu-link" data-astro-cid-jyixok4n> <span data-astro-cid-jyixok4n></span> </a>  <script type="module">function c(){const e=document.getElementById("layout"),n=document.getElementById("menu"),t=document.getElementById("menuLink"),s=document.getElementById("main");function i(o){o.preventDefault(),e?.classList.toggle("active"),n?.classList.toggle("active"),t?.classList.toggle("active")}function a(){e?.classList.remove("active"),n?.classList.remove("active"),t?.classList.remove("active")}t?.addEventListener("click",i),s?.addEventListener("click",()=>{e?.classList.contains("active")&&a()})}c();document.addEventListener("astro:after-swap",c);</script> <div id="menu" data-astro-cid-ssfzsv2f> <div class="menu-inner" data-astro-cid-ssfzsv2f> <ul class="menu-list" data-astro-cid-ssfzsv2f> <li class="menu-label" data-astro-cid-ssfzsv2f>Versions:</li> <li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.5" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.5 </a> </li><li class="menu-item selected" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.4" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.4 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.3" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.3 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.2" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.2 </a> </li><li class="menu-item" data-astro-cid-ssfzsv2f> <a href="/spec/1.0.0-rc.1" class="menu-link-item" data-astro-cid-ssfzsv2f> 1.0.0-rc.1 </a> </li> </ul> </div> <div class="links" data-astro-cid-ssfzsv2f> <a href="https://github.com/jimeh/common-flow" aria-label="View on GitHub" class="github-link" data-astro-cid-ssfzsv2f> <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" data-astro-cid-ssfzsv2f> <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839
              9.504.5.092.682-.217.682-.483
              0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608
              1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088
@@ -10,30 +10,17 @@
              2.688 0 3.848-2.339 4.695-4.566
              4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012
              2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22
-             6.484 17.522 2 12 2z" clip-rule="evenodd" data-astro-cid-ssfzsv2f></path> </svg> </a> </div> </div>  <div id="main" data-astro-cid-jwirc66j> <div class="content" data-astro-cid-jwirc66j>  <article class="spec-content"> <h1 id="git-common-flow-100-rc5">Git Common-Flow 1.0.0-rc.5</h1>
-<img src="/spec/1.0.0-rc.5.svg" alt="Git Common-Flow 1.0.0-rc.5 diagram" width="100%">
-<h2 id="introduction">Introduction</h2>
+             6.484 17.522 2 12 2z" clip-rule="evenodd" data-astro-cid-ssfzsv2f></path> </svg> </a> </div> </div>  <div id="main" data-astro-cid-jwirc66j> <div class="content" data-astro-cid-jwirc66j>  <article class="spec-content"> <h1 id="git-common-flow-100-rc4">Git Common-Flow 1.0.0-rc.4</h1>
+<img src="/spec/1.0.0-rc.4.svg" alt="Git Common-Flow 1.0.0-rc.4 diagram" width="100%">
+<h2 id="summary">Summary</h2>
 <p>Common-Flow is an attempt to gather a sensible selection of the most common
 usage patterns of git into a single and concise specification. It is based on
 the <a href="http://scottchacon.com/2011/08/31/github-flow.html">original variant</a>
 of <a href="https://guides.github.com/introduction/flow/">GitHub Flow</a>, while taking
-into account how a lot of open source projects most commonly use git.</p>
+into account how a lot of open source projects use git.</p>
 <p>In short, Common-Flow is essentially GitHub Flow with the addition of versioned
 releases, optional release branches, and without the requirement to deploy to
 production all the time.</p>
-<h2 id="summary">Summary</h2>
-<ul>
-<li>The “master” branch is the mainline branch with latest changes, and must not
-be broken.</li>
-<li>Changes (features, bugfixes, etc.) are done on “change branches” created from
-the master branch.</li>
-<li>Rebase change branches <a href="https://i.imgur.com/1RS8x2d.png">early and often</a>.</li>
-<li>When a change branch is stable and ready, it is merged back in to master.</li>
-<li>A release is just a git tag who’s name is the exact release version string
-(e.g. “2.11.4”).</li>
-<li>Release branches can be used to avoid change freezes on master. They are not
-required, instead they are available if you need them.</li>
-</ul>
 <h2 id="terminology">Terminology</h2>
 <ul>
 <li><strong>Master Branch</strong> - Must be named “master”, must always have passing tests,
@@ -60,7 +47,7 @@ interpreted as described in <a href="https://tools.ietf.org/html/rfc2119">RFC 21
 <ol>
 <li>TL;DR
 <ol>
-<li>Do not break the master branch.</li>
+<li>Don’t break the master branch.</li>
 <li>A release is a git tag.</li>
 </ol>
 </li>
@@ -129,9 +116,8 @@ with its source branch, the test suite is passing, and you and others are
 happy with the change. This is especially important if the merge target
 is the master branch.</li>
 <li>To get feedback, help, or generally just discuss a change branch with
-others, it is RECOMMENDED you create a pull request and discuss the
-changes with others there. This leaves a clear and visible history of
-how, when, and why the code looks and behaves the way it does.</li>
+others, the RECOMMENDED way to do so is by creating a pull request and
+discuss the changes with others there.</li>
 </ol>
 </li>
 <li>Versioning
@@ -231,8 +217,8 @@ releases MUST be named “release-2.9”.</li>
 MUST be created from the relevant release tag. For example if the master
 branch is on version 2.11.4 and there is a security fix for all 2.9.x
 releases, the latest of which is “2.9.7”. Create a new branch called
-“release-2.9” from the “2.9.7” release tag. The security fix release will
-then end up being version “2.9.8”.</li>
+“release-2.9” off of the “2.9.7” release tag. The security fix release
+will then end up being version “2.9.8”.</li>
 <li>To create a new release from a long-term release branch, you MUST follow
 the same process as a release from the master branch, except the
 long-term release branch takes the place of the master branch.</li>
@@ -291,7 +277,7 @@ really change much:</p>
 <ul>
 <li>You create change branches instead of feature branches, without the need of a
 “feature/” or “change/” prefix in the branch name.</li>
-<li>Change branches are typically created from and merged back into “master”
+<li>Change branches are typically created off of and merged back into “master”
 instead of “develop”.</li>
 <li>Creating a release is done by simply creating a git tag, typically on the
 master branch.</li>
@@ -335,17 +321,12 @@ is and what it does. Here’s a few examples:</p>
 <li>remove-sort-by-middle-name-functionality</li>
 <li>update-font-awesome</li>
 <li>change-search-behavior</li>
-<li>improve-pagination-performance</li>
 <li>tweak-footer-style</li>
 </ul>
 <p>Notice how none of these have any prefixes like “feature/” or “hotfix/”, they’re
 not needed when branch names are properly descriptive. However there’s nothing
-to say you can’t use such prefixes if you want.</p>
-<p>You can also add ticket numbers to the branch name if your team/org has that as
-part of it’s process. But it is recommended that ticket numbers are added to the
-end of the branch name. The ticket number is essentially metadata, so put it at
-the end and out of the way of humans trying to read the descriptive name from
-left to right.</p>
+to say you can’t use such prefixes if you want. That also means that you can add
+ticket number prefixes if your team/org has that as part of it’s process.</p>
 <h3 id="how-do-we-release-an-emergency-hotfix-when-the-master-branch-is-broken">How do we release an emergency hotfix when the master branch is broken?</h3>
 <p>This should ideally never happen, however if it does you can do one of the
 following:</p>
@@ -363,8 +344,8 @@ a instant fix to the situation at hand, and let’s you resolve the issues with
 the master branch when you have more time on your hands.</p>
 <h2 id="about">About</h2>
 <p>The Git Common-Flow specification is authored
-by <a href="https://jimeh.me/">Jim Myhrberg</a>.</p>
+by <a href="http://jimeh.me">Jim Myhrberg</a>.</p>
 <p>If you’d like to leave feedback,
 please <a href="https://github.com/jimeh/common-flow/issues">open an issue on GitHub</a>.</p>
 <h2 id="license">License</h2>
-<p><a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons - CC BY 4.0</a></p> </article>  </div> </div> </div> </body></html>
+<p><a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons - CC BY 3.0</a></p> </article>  </div> </div> </div> </body></html>

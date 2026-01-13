@@ -1,0 +1,21 @@
+---
+import { getCollection, render } from "astro:content";
+import Default from "../layouts/Default.astro";
+import { config } from "../config";
+
+// Get all specs and find the current version
+const specs = await getCollection("spec");
+const currentSpec = specs.find((s) => s.data.version === config.currentVersion);
+
+if (!currentSpec) {
+  return Astro.redirect("/404");
+}
+
+const { Content } = await render(currentSpec);
+---
+
+<Default title={currentSpec.data.title} version={currentSpec.data.version}>
+  <article class="spec-content">
+    <Content />
+  </article>
+</Default>

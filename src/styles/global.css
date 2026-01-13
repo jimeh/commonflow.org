@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Colors */
+  --color-sidebar: #191818;
+  --color-sidebar-hover: #333;
+  --color-accent: #1f8dd6;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #777;
+  --color-text-muted: #999;
+  --color-bg-primary: #fdfdfd;
+  --color-bg-code: #f6f8fa;
+  --color-bg-code-inline: rgba(27, 31, 35, 0.05);
+  --color-border: #333;
+
+  /* Fonts */
+  --font-sans: "Open Sans", Helvetica, Arial, sans-serif;
+  --font-heading: "Open Sans Condensed", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+
+  /* Sizing */
+  --sidebar-width: 150px;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: #333;
+  }
+
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.2;
+  }
+
+  /* Nested list styling */
+  ol ol,
+  ul ol {
+    list-style-type: lower-roman;
+  }
+
+  ul ul ol,
+  ul ol ol,
+  ol ul ol,
+  ol ol ol {
+    list-style-type: lower-alpha;
+  }
+
+  a {
+    word-break: break-word;
+  }
+
+  code {
+    background-color: var(--color-bg-code-inline);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 85%;
+    margin: 0;
+    padding: 0.3em 0.4em 0.1em 0.4em;
+  }
+
+  pre {
+    background-color: var(--color-bg-code);
+    border-radius: 3px;
+    line-height: 1.45;
+    padding: 16px;
+  }
+
+  pre > code {
+    background-color: transparent !important;
+    border-radius: 0;
+    font-size: 90%;
+    padding: 0;
+  }
+}
+
+/* Layout transitions */
+@layer components {
+  #layout,
+  #menu,
+  .menu-link {
+    transition: all 0.2s ease-out;
+  }
+
+  /* Spec content styling */
+  .spec-content h1 {
+    margin-bottom: 0.5em;
+  }
+
+  .spec-content h2 {
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eee;
+  }
+
+  .spec-content h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .spec-content p {
+    margin-bottom: 1em;
+  }
+
+  .spec-content ul,
+  .spec-content ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+
+  .spec-content li {
+    margin-bottom: 0.25em;
+  }
+
+  .spec-content a {
+    color: #1f8dd6;
+    text-decoration: none;
+  }
+
+  .spec-content a:hover {
+    text-decoration: underline;
+  }
+
+  .spec-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+  }
+
+  .spec-content blockquote {
+    margin: 1em 0;
+    padding-left: 1em;
+    border-left: 4px solid #ddd;
+    color: #666;
+  }
+
+  .spec-content hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid #eee;
+  }
+}

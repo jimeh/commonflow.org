@@ -1,0 +1,48 @@
+---
+import Default from "../layouts/Default.astro";
+---
+
+<Default title="Page Not Found">
+  <div class="not-found">
+    <h1>404</h1>
+    <p>Page not found.</p>
+    <p>
+      <a href="/">Go to the homepage</a>
+    </p>
+  </div>
+</Default>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding-top: 4rem;
+  }
+
+  .not-found h1 {
+    font-size: 6rem;
+    margin-bottom: 0.5rem;
+    color: #999;
+  }
+
+  .dark .not-found h1 {
+    color: #666;
+  }
+
+  .not-found p {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .not-found a {
+    color: #1f8dd6;
+    text-decoration: none;
+  }
+
+  .not-found a:hover {
+    text-decoration: underline;
+  }
+
+  .dark .not-found a {
+    color: #4da6e8;
+  }
+</style>
