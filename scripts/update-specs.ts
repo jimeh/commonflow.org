@@ -179,7 +179,8 @@ async function fetchSpec(version: string): Promise<Spec> {
   }
 
   // Extract title from first line (after version replacement)
-  const title = lines[0];
+  // Handle both ATX-style (# Title) and setext-style (Title\n===) headings
+  const title = lines[0].replace(/^#\s+/, "");
 
   // Build body with frontmatter
   const body = updateConfig.bodyTemplate
