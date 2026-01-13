@@ -1,0 +1,130 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<div class="relative group">
+  <button
+    data-theme-toggle
+    type="button"
+    class="p-2 rounded-lg cursor-pointer transition-colors duration-200
+           text-gray-500 dark:text-neutral-500
+           hover:text-gray-950 dark:hover:text-neutral-50
+           hover:bg-gray-100 dark:hover:bg-neutral-800"
+    aria-label="Toggle theme"
+  >
+    <Icon name="heroicons:sun" data-theme-icon="light" class="hidden w-5 h-5" />
+    <Icon name="heroicons:moon" data-theme-icon="dark" class="hidden w-5 h-5" />
+    <Icon
+      name="heroicons:computer-desktop"
+      data-theme-icon="auto"
+      class="hidden w-5 h-5"
+    />
+  </button>
+  <!-- Tooltip -->
+  <div
+    class="absolute left-1/2 -translate-x-1/2 top-full mt-2
+           px-2 py-1 text-xs font-medium whitespace-nowrap rounded-md shadow-sm
+           bg-gray-900 text-white dark:bg-white dark:text-gray-900
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200 pointer-events-none"
+  >
+    <span data-tooltip-text="light" class="hidden">Light</span>
+    <span data-tooltip-text="dark" class="hidden">Dark</span>
+    <span data-tooltip-text="auto" class="hidden">System</span>
+  </div>
+</div>
+
+<script>
+  type ThemeMode = "light" | "dark" | "auto";
+
+  function initTheme() {
+    const toggles = document.querySelectorAll(
+      "[data-theme-toggle]",
+    ) as NodeListOf<HTMLButtonElement>;
+
+    function getStoredMode(): ThemeMode {
+      const stored = localStorage.getItem("theme");
+      if (stored === "dark" || stored === "light" || stored === "auto") {
+        return stored;
+      }
+      return "auto";
+    }
+
+    function getSystemTheme(): "dark" | "light" {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+
+    function getEffectiveTheme(mode: ThemeMode): "dark" | "light" {
+      if (mode === "auto") {
+        return getSystemTheme();
+      }
+      return mode;
+    }
+
+    function updateAllIcons(mode: ThemeMode) {
+      document.querySelectorAll("[data-theme-icon]").forEach((icon) => {
+        const iconMode = (icon as HTMLElement).dataset.themeIcon;
+        icon.classList.toggle("hidden", iconMode !== mode);
+      });
+      document.querySelectorAll("[data-tooltip-text]").forEach((text) => {
+        const textMode = (text as HTMLElement).dataset.tooltipText;
+        text.classList.toggle("hidden", textMode !== mode);
+      });
+    }
+
+    function applyTheme(mode: ThemeMode) {
+      const effective = getEffectiveTheme(mode);
+      if (effective === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      updateAllIcons(mode);
+    }
+
+    function setMode(mode: ThemeMode) {
+      localStorage.setItem("theme", mode);
+      applyTheme(mode);
+    }
+
+    function cycleMode(): ThemeMode {
+      const current = getStoredMode();
+      // Cycle: light → dark → auto → light
+      if (current === "light") return "dark";
+      if (current === "dark") return "auto";
+      return "light";
+    }
+
+    // Initialize theme
+    const currentMode = getStoredMode();
+    applyTheme(currentMode);
+
+    // Attach click handlers to all toggle buttons
+    toggles.forEach((toggle) => {
+      // Avoid adding duplicate listeners
+      if (toggle.dataset.initialized) return;
+      toggle.dataset.initialized = "true";
+
+      toggle.addEventListener("click", () => {
+        setMode(cycleMode());
+      });
+    });
+
+    // Listen for system preference changes (only affects auto mode)
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", () => {
+        if (getStoredMode() === "auto") {
+          applyTheme("auto");
+        }
+      });
+  }
+
+  // Run on initial load
+  initTheme();
+
+  // Re-run on Astro page transitions
+  document.addEventListener("astro:after-swap", initTheme);
+</script>

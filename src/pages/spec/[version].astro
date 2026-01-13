@@ -1,6 +1,8 @@
 ---
-import { getCollection, render } from "astro:content";
-import Default from "../../layouts/Default.astro";
+import { getCollection } from "astro:content";
+
+import SpecLayout from "../../layouts/SpecLayout.astro";
+import { getVersionInfo } from "../../utils/versions";
 
 export async function getStaticPaths() {
   const specs = await getCollection("spec");
@@ -11,11 +13,7 @@ export async function getStaticPaths() {
 }
 
 const { spec } = Astro.props;
-const { Content } = await render(spec);
+const { versions } = await getVersionInfo();
 ---
 
-<Default title={spec.data.title} version={spec.data.version}>
-  <article class="spec-content">
-    <Content />
-  </article>
-</Default>
+<SpecLayout spec={spec} versions={versions} />

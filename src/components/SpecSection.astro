@@ -1,0 +1,71 @@
+---
+import { Icon } from "astro-icon/components";
+import SectionHeader from "./SectionHeader.astro";
+import SpecSidebar from "./SpecSidebar.astro";
+import type { TocItem } from "../utils/parseSpecContent";
+
+interface Props {
+  terminology: string;
+  terminologyTitle: string;
+  specification: string;
+  tocItems: TocItem[];
+  version: string;
+}
+
+const { terminology, terminologyTitle, specification, tocItems, version } =
+  Astro.props;
+---
+
+<section id="spec" class="py-20 sm:py-28">
+  <div class="section-container">
+    <SectionHeader
+      title="The Specification"
+      subtitle="The complete Git Common-Flow specification"
+      class="max-w-3xl mx-auto"
+    />
+
+    <div class="flex justify-center mb-8 -mt-8">
+      <a
+        href={`/spec/${version}/md`}
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
+               font-medium rounded-lg transition-colors
+               text-gray-500 dark:text-neutral-500
+               hover:bg-gray-100 hover:text-gray-700
+               dark:hover:bg-neutral-800 dark:hover:text-neutral-300"
+      >
+        <Icon name="heroicons:code-bracket" class="w-4 h-4" />
+        View Markdown Version
+      </a>
+    </div>
+
+    <!-- Content with sidebar -->
+    <div class="lg:flex lg:gap-8">
+      <!-- Sidebar -->
+      <div class="lg:w-64 lg:flex-shrink-0">
+        <SpecSidebar items={tocItems} />
+      </div>
+
+      <!-- Main content -->
+      <div class="flex-1 min-w-0">
+        <article class="prose-spec">
+          <!-- Terminology -->
+          <section id="terminology">
+            <h2>{terminologyTitle}</h2>
+            <Fragment set:html={terminology} />
+          </section>
+
+          <!-- Main specification -->
+          <section id="specification">
+            <h2>Specification</h2>
+            <Fragment set:html={specification} />
+          </section>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initClauseHighlight } from "../scripts/clauseHighlight";
+  initClauseHighlight();
+</script>

@@ -1,0 +1,92 @@
+---
+import { Icon } from "astro-icon/components";
+import SectionHeader from "./SectionHeader.astro";
+import type { FAQItem } from "../utils/parseSpecContent";
+
+interface Props {
+  items: FAQItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section id="faq" class="py-20 sm:py-28">
+  <div class="section-container">
+    <div class="max-w-3xl mx-auto">
+      <SectionHeader
+        title="FAQ"
+        subtitle="Common questions about Git Common-Flow"
+      />
+
+      <!-- FAQ Items -->
+      <div class="space-y-0">
+        {
+          items.map((item) => (
+            <div
+              class="border-b border-gray-200 dark:border-neutral-800"
+              data-faq-item
+            >
+              <button
+                class="flex justify-between items-center w-full py-6 text-left
+                       font-display text-lg font-semibold cursor-pointer
+                       transition-colors
+                       text-gray-950 dark:text-neutral-50
+                       hover:text-sky-600"
+                aria-expanded="false"
+                data-faq-trigger
+              >
+                <span class="pr-4">{item.question}</span>
+                <Icon
+                  name="heroicons:chevron-down"
+                  class="w-5 h-5 flex-shrink-0 transition-transform duration-200"
+                  data-faq-icon
+                />
+              </button>
+              <div
+                class="grid grid-rows-[0fr] transition-[grid-template-rows] duration-300 ease-out"
+                data-faq-content
+              >
+                <div class="overflow-hidden">
+                  <div
+                    class="pb-6 text-gray-600 dark:text-neutral-400 prose-spec"
+                    set:html={item.answer}
+                  />
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initFAQ() {
+    const items = document.querySelectorAll("[data-faq-item]");
+
+    items.forEach((item) => {
+      const trigger = item.querySelector("[data-faq-trigger]");
+      const content = item.querySelector("[data-faq-content]");
+      const icon = item.querySelector("[data-faq-icon]");
+
+      if (!trigger || !content || !icon) return;
+
+      trigger.addEventListener("click", () => {
+        const isExpanded = trigger.getAttribute("aria-expanded") === "true";
+
+        // Toggle current item
+        trigger.setAttribute("aria-expanded", isExpanded ? "false" : "true");
+        content.classList.toggle("grid-rows-[1fr]", !isExpanded);
+        content.classList.toggle("grid-rows-[0fr]", isExpanded);
+        icon.classList.toggle("rotate-180", !isExpanded);
+      });
+    });
+  }
+
+  // Initialize on load
+  initFAQ();
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener("astro:after-swap", initFAQ);
+</script>

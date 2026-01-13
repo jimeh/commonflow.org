@@ -1,0 +1,34 @@
+---
+import type { TocItem } from "../utils/parseSpecContent";
+
+interface Props {
+  item: TocItem;
+  trackActive?: boolean;
+}
+
+const { item, trackActive = false } = Astro.props;
+---
+
+<a
+  href={`#${item.id}`}
+  class:list={[
+    "sidebar-link block py-2 px-4 text-sm rounded-md",
+    "transition-colors",
+    "text-gray-500 hover:text-gray-950 hover:bg-gray-100",
+    "dark:text-neutral-500 dark:hover:text-neutral-50 dark:hover:bg-neutral-800",
+    item.level === 3 && "pl-6 text-[0.8125rem]",
+    item.clause && "flex",
+  ]}
+  data-sidebar-link={trackActive ? "" : undefined}
+  data-section-id={trackActive ? item.id : undefined}
+  data-toc-link={!trackActive ? "" : undefined}
+>
+  {
+    item.clause && (
+      <span class="shrink-0 w-6 text-gray-400 dark:text-neutral-600">
+        {item.clause}
+      </span>
+    )
+  }
+  <span>{item.title}</span>
+</a>

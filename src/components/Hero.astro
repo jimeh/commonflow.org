@@ -1,0 +1,196 @@
+---
+import { Icon } from "astro-icon/components";
+import VersionSelector from "./VersionSelector.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { config } from "../config";
+
+interface Props {
+  version: string;
+  versions: string[];
+  svgContent?: string | null;
+}
+
+const { version, versions, svgContent } = Astro.props;
+
+const navItems = [
+  { id: "about", label: "About" },
+  { id: "spec", label: "Read the Spec", primary: true },
+  { id: "faq", label: "FAQ" },
+];
+
+const baseClasses = `inline-flex items-center justify-center gap-2
+  px-4 py-2.5 sm:px-6 sm:py-3
+  text-sm sm:text-base font-medium rounded-lg
+  transition-all cursor-pointer`;
+
+const primaryClasses = `bg-sky-600 text-white
+  hover:bg-sky-500 hover:-translate-y-0.5 hover:shadow-md`;
+
+const secondaryClasses = `text-gray-600 dark:text-neutral-400
+  hover:bg-gray-100 hover:text-gray-950
+  dark:hover:bg-neutral-800 dark:hover:text-neutral-50`;
+---
+
+<section
+  id="top"
+  class="relative min-h-[75vh] flex flex-col items-center justify-center
+         px-6 pt-16 pb-24 overflow-hidden"
+>
+  <!-- Background gradient/texture -->
+  <div
+    class="absolute inset-0 bg-gradient-to-b
+           from-gray-100 to-gray-50
+           dark:from-neutral-900 dark:to-neutral-950"
+  >
+  </div>
+
+  <!-- Subtle grid pattern with fade -->
+  <div
+    class="absolute inset-0 opacity-[0.06] dark:opacity-[0.12]
+           bg-[linear-gradient(theme(colors.gray.950)_1px,transparent_1px),linear-gradient(90deg,theme(colors.gray.950)_1px,transparent_1px)]
+           dark:bg-[linear-gradient(theme(colors.neutral.600)_1px,transparent_1px),linear-gradient(90deg,theme(colors.neutral.600)_1px,transparent_1px)]
+           bg-[size:60px_60px] bg-center
+           [-webkit-mask-image:linear-gradient(to_bottom,black_20%,transparent_80%)]
+           [mask-image:linear-gradient(to_bottom,black_20%,transparent_80%)]"
+  >
+  </div>
+
+  <!-- Top bar with version & theme -->
+  <div
+    class="absolute top-0 inset-x-0 z-20 flex items-center justify-between
+           px-6 py-4 animate-fade-in-down"
+  >
+    <div class="flex items-center gap-3">
+      <VersionSelector currentVersion={version} versions={versions} />
+    </div>
+    <div class="flex items-center gap-2">
+      <ThemeToggle />
+      <a
+        href={config.repoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="p-2 rounded-lg transition-colors
+               text-gray-500 dark:text-neutral-500
+               hover:text-gray-950 dark:hover:text-neutral-50
+               hover:bg-white/50 dark:hover:bg-neutral-800/50"
+        aria-label="View on GitHub"
+      >
+        <Icon name="simple-icons:github" class="w-5 h-5" />
+      </a>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="relative z-10 w-full max-w-4xl mx-auto text-center">
+    <!-- Title -->
+    <h1
+      class="animate-fade-in-up mb-4
+             text-gray-950 dark:text-neutral-50"
+    >
+      Git Common-Flow
+    </h1>
+
+    <!-- Tagline -->
+    <p
+      class="animate-fade-in-up delay-100
+             text-lg sm:text-xl max-w-2xl mx-auto mb-8
+             text-gray-600 dark:text-neutral-400"
+    >
+      A sensible git workflow for teams who ship
+    </p>
+
+    <!-- Version badge -->
+    <div class="animate-fade-in-up delay-200 mb-10">
+      <span
+        class="inline-flex items-center px-3 py-1 font-mono text-xs font-medium
+               rounded-full border
+               bg-gray-100 border-gray-200 text-gray-500
+               dark:bg-neutral-800/50 dark:border-neutral-700 dark:text-neutral-400"
+      >
+        v{version}
+      </span>
+    </div>
+
+    <!-- SVG Diagram -->
+    {
+      svgContent && (
+        <div
+          class="animate-fade-in-up delay-300
+                 relative mx-auto mb-12 py-8 px-6 sm:py-16 sm:px-14
+                 bg-white dark:bg-neutral-900
+                 rounded-2xl shadow-lg dark:shadow-none
+                 border border-gray-200 dark:border-neutral-800"
+        >
+          <div
+            class="w-full max-w-3xl mx-auto [&>svg]:w-full [&>svg]:h-auto
+                   dark:invert dark:hue-rotate-180 dark:contrast-90"
+            set:html={svgContent}
+          />
+        </div>
+      )
+    }
+
+    <!-- Navigation links -->
+    <nav
+      class="animate-fade-in-up delay-400
+             flex flex-nowrap items-center justify-center gap-2 sm:gap-4"
+    >
+      {
+        navItems.map((item) => (
+          <a
+            href={`#${item.id}`}
+            class:list={[
+              baseClasses,
+              item.primary ? primaryClasses : secondaryClasses,
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+
+  <!-- Scroll indicator -->
+  <a
+    href="#about"
+    class="absolute bottom-8 left-1/2 -translate-x-1/2
+           animate-fade-in delay-700
+           text-gray-500 dark:text-neutral-500
+           hover:text-sky-600 transition-colors"
+    aria-label="Scroll to content"
+  >
+    <Icon name="heroicons:arrow-down" class="w-6 h-6 animate-bounce-subtle" />
+  </a>
+</section>
+
+<script>
+  // Remove animation classes after they complete to prevent re-triggering
+  // on theme toggle.
+  const animationClasses = [
+    "animate-fade-in",
+    "animate-fade-in-up",
+    "animate-fade-in-down",
+    "animate-slide-in-left",
+  ];
+
+  function cleanupAnimations() {
+    const selector = animationClasses.map((c) => `.${c}`).join(", ");
+    const animatedElements = document.querySelectorAll(selector);
+
+    animatedElements.forEach((el) => {
+      el.addEventListener(
+        "animationend",
+        () => {
+          animationClasses.forEach((cls) => el.classList.remove(cls));
+          // Also remove delay classes
+          el.className = el.className.replace(/\bdelay-\d+\b/g, "").trim();
+        },
+        { once: true },
+      );
+    });
+  }
+
+  cleanupAnimations();
+  document.addEventListener("astro:after-swap", cleanupAnimations);
+</script>

@@ -1,21 +1,17 @@
 ---
-import { getCollection, render } from "astro:content";
-import Default from "../layouts/Default.astro";
-import { config } from "../config";
+import { getCollection } from "astro:content";
 
-// Get all specs and find the current version
+import SpecLayout from "../layouts/SpecLayout.astro";
+import { getVersionInfo } from "../utils/versions";
+
+// Get version info and render the current/latest version
+const { versions, currentVersion } = await getVersionInfo();
 const specs = await getCollection("spec");
-const currentSpec = specs.find((s) => s.data.version === config.currentVersion);
+const spec = specs.find((s) => s.data.version === currentVersion);
 
-if (!currentSpec) {
-  return Astro.redirect("/404");
+if (!spec) {
+  throw new Error(`Spec version ${currentVersion} not found`);
 }
-
-const { Content } = await render(currentSpec);
 ---
 
-<Default title={currentSpec.data.title} version={currentSpec.data.version}>
-  <article class="spec-content">
-    <Content />
-  </article>
-</Default>
+<SpecLayout spec={spec} versions={versions} />

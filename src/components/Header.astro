@@ -1,0 +1,182 @@
+---
+import { Icon } from "astro-icon/components";
+import VersionSelector from "./VersionSelector.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { config } from "../config";
+
+interface Props {
+  version: string;
+  versions: string[];
+}
+
+const { version, versions } = Astro.props;
+
+const navItems = [
+  { id: "about", label: "About", icon: "heroicons:information-circle" },
+  { id: "spec", label: "Spec", icon: "heroicons:document-text" },
+  { id: "faq", label: "FAQ", icon: "heroicons:question-mark-circle" },
+];
+---
+
+<header
+  id="site-header"
+  class="fixed top-0 inset-x-0 z-50 border-b border-transparent
+         translate-y-[-100%] transition-transform duration-300
+         backdrop-blur-xl bg-gray-50/85 dark:bg-neutral-950/85"
+>
+  <div
+    class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between"
+  >
+    <!-- Logo / Title + Version -->
+    <div class="flex items-center gap-3">
+      <a
+        href="#top"
+        class="flex items-center gap-3 no-underline
+               text-gray-950 dark:text-neutral-50
+               hover:text-sky-600 transition-colors"
+      >
+        <span class="font-display font-bold text-lg tracking-tight">
+          Git Common-Flow
+        </span>
+      </a>
+      <div class="hidden md:block">
+        <VersionSelector currentVersion={version} versions={versions} />
+      </div>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex items-center gap-1">
+      {
+        navItems.map((item) => (
+          <a
+            href={`#${item.id}`}
+            class="nav-link inline-flex items-center gap-1.5 px-4 py-2 text-sm
+                   font-medium rounded-lg transition-colors cursor-pointer
+                   text-gray-600 dark:text-neutral-400
+                   hover:bg-gray-100 hover:text-gray-950
+                   dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+            data-nav-link
+            data-section-id={item.id}
+          >
+            <Icon name={item.icon} class="w-4 h-4" />
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <!-- Right side: Theme, GitHub -->
+    <div class="flex items-center gap-3">
+      <ThemeToggle />
+
+      <a
+        href={config.repoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="p-2 rounded-lg transition-colors
+               text-gray-500 dark:text-neutral-500
+               hover:text-gray-950 dark:hover:text-neutral-50
+               hover:bg-gray-100 dark:hover:bg-neutral-800"
+        aria-label="View on GitHub"
+      >
+        <Icon name="simple-icons:github" class="w-5 h-5" />
+      </a>
+
+      <!-- Mobile menu button -->
+      <button
+        id="mobile-menu-btn"
+        class="md:hidden p-2 rounded-lg
+               text-gray-500 dark:text-neutral-500
+               hover:bg-gray-100 dark:hover:bg-neutral-800"
+        aria-label="Toggle menu"
+      >
+        <Icon name="heroicons:bars-3" class="w-5 h-5" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <nav
+    id="mobile-nav"
+    class="md:hidden hidden border-t border-gray-200 dark:border-neutral-800"
+  >
+    <div class="px-4 py-3 space-y-1 text-center">
+      <div class="py-2 flex justify-center">
+        <VersionSelector currentVersion={version} versions={versions} />
+      </div>
+      {
+        navItems.map((item) => (
+          <a
+            href={`#${item.id}`}
+            class="nav-link flex items-center justify-center gap-1.5 py-2
+                   text-gray-600 dark:text-neutral-400 hover:text-sky-600"
+            data-nav-link
+            data-section-id={item.id}
+          >
+            <Icon name={item.icon} class="w-4 h-4" />
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+  </nav>
+</header>
+
+<script>
+  import { initActiveSectionTracker } from "../scripts/activeSectionTracker";
+
+  function initHeader() {
+    const header = document.getElementById("site-header");
+    const hero = document.getElementById("top");
+    const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+    const mobileNav = document.getElementById("mobile-nav");
+
+    if (!header || !hero) return;
+
+    // Show/hide header based on scroll position
+    // Show header once scrolled down by the navbar height (64px)
+    const navbarHeight = 64;
+
+    function updateHeaderVisibility() {
+      if (!header) return;
+      if (window.scrollY >= navbarHeight) {
+        header.classList.remove("translate-y-[-100%]", "border-transparent");
+        header.classList.add("border-gray-200", "dark:border-neutral-800");
+      } else {
+        header.classList.add("translate-y-[-100%]", "border-transparent");
+        header.classList.remove("border-gray-200", "dark:border-neutral-800");
+      }
+    }
+
+    window.addEventListener("scroll", updateHeaderVisibility, {
+      passive: true,
+    });
+    updateHeaderVisibility();
+
+    // Mobile menu toggle
+    if (mobileMenuBtn && mobileNav) {
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileNav.classList.toggle("hidden");
+      });
+
+      // Close menu when clicking a link
+      mobileNav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileNav.classList.add("hidden");
+        });
+      });
+    }
+
+    // Active section tracking for nav links
+    initActiveSectionTracker({
+      linkSelector: "[data-nav-link]",
+      defaultToFirst: false,
+    });
+  }
+
+  // Initialize on load
+  initHeader();
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener("astro:after-swap", initHeader);
+</script>

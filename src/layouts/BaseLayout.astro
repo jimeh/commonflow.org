@@ -1,0 +1,76 @@
+---
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/dm-sans";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+import { config } from "../config";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = config.description } = Astro.props;
+const fullTitle = title === config.title ? title : `${title} | ${config.title}`;
+const canonicalUrl = Astro.url.href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={config.author} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Prevent flash of wrong theme -->
+    <script is:inline>
+      (function () {
+        const mode = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        if (mode === "dark" || (mode !== "light" && prefersDark)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <slot />
+
+    <!-- Re-init theme on Astro page transitions -->
+    <script>
+      document.addEventListener("astro:after-swap", () => {
+        const mode = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        if (mode === "dark" || (mode !== "light" && prefersDark)) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      });
+    </script>
+  </body>
+</html>

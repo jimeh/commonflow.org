@@ -1,0 +1,132 @@
+---
+import { Icon } from "astro-icon/components";
+import TocLink from "./TocLink.astro";
+import type { TocItem } from "../utils/parseSpecContent";
+
+interface Props {
+  items: TocItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<aside
+  id="spec-sidebar"
+  class="hidden lg:block lg:sticky lg:top-24 lg:self-start
+         lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto
+         lg:pr-8 lg:mr-8 lg:border-r border-gray-200 dark:border-neutral-800"
+>
+  <nav class="space-y-1 py-2">
+    <div
+      class="text-xs font-semibold uppercase tracking-wider mb-4
+             text-gray-500 dark:text-neutral-500"
+    >
+      Table of Contents
+    </div>
+    {items.map((item) => <TocLink item={item} trackActive />)}
+  </nav>
+</aside>
+
+<!-- Mobile floating button -->
+<button
+  id="spec-toc-toggle"
+  class="lg:hidden fixed bottom-6 right-6 z-40
+         w-12 h-12 rounded-full shadow-lg
+         bg-sky-600 text-white
+         flex items-center justify-center
+         hover:bg-sky-500
+         transition-all duration-200"
+  aria-label="Jump to section"
+>
+  <Icon name="heroicons:bars-3-bottom-left" class="w-5 h-5" />
+</button>
+
+<!-- Mobile TOC drawer -->
+<div
+  id="spec-toc-drawer"
+  class="lg:hidden fixed inset-0 z-50 hidden"
+  data-toc-drawer
+>
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/50" data-toc-backdrop></div>
+
+  <!-- Drawer -->
+  <div
+    class="absolute bottom-0 inset-x-0 max-h-[70vh] overflow-y-auto
+           bg-gray-50 dark:bg-neutral-950
+           rounded-t-2xl shadow-xl p-6"
+  >
+    <div class="flex items-center justify-between mb-4">
+      <span
+        class="text-sm font-semibold uppercase tracking-wider
+               text-gray-500 dark:text-neutral-500"
+      >
+        Jump to Section
+      </span>
+      <button
+        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800"
+        data-toc-close
+        aria-label="Close"
+      >
+        <Icon name="heroicons:x-mark" class="w-5 h-5" />
+      </button>
+    </div>
+
+    <nav class="space-y-1">
+      {items.map((item) => <TocLink item={item} />)}
+    </nav>
+  </div>
+</div>
+
+<script>
+  import { initActiveSectionTracker } from "../scripts/activeSectionTracker";
+
+  function initSpecSidebar() {
+    // Active section tracking for sidebar links
+    initActiveSectionTracker({
+      linkSelector: "[data-sidebar-link]",
+    });
+
+    // Mobile TOC drawer
+    const toggleBtn = document.getElementById("spec-toc-toggle");
+    const drawer = document.getElementById("spec-toc-drawer");
+    const backdrop = drawer?.querySelector("[data-toc-backdrop]");
+    const closeBtn = drawer?.querySelector("[data-toc-close]");
+    const tocLinks = drawer?.querySelectorAll("[data-toc-link]");
+
+    function openDrawer() {
+      drawer?.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer() {
+      drawer?.classList.add("hidden");
+      document.body.style.overflow = "";
+    }
+
+    toggleBtn?.addEventListener("click", openDrawer);
+    backdrop?.addEventListener("click", closeDrawer);
+    closeBtn?.addEventListener("click", closeDrawer);
+    tocLinks?.forEach((link) => {
+      link.addEventListener("click", closeDrawer);
+    });
+
+    // Show/hide mobile toggle based on spec section visibility
+    const specSection = document.getElementById("spec");
+    if (specSection && toggleBtn) {
+      const specObserver = new IntersectionObserver(
+        ([entry]) => {
+          toggleBtn.classList.toggle("hidden", !entry.isIntersecting);
+        },
+        { threshold: 0 },
+      );
+      specObserver.observe(specSection);
+    }
+  }
+
+  // Initialize on load
+  initSpecSidebar();
+
+  // Re-initialize on Astro page transitions
+  document.addEventListener("astro:after-swap", initSpecSidebar);
+</script>
