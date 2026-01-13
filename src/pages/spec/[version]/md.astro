@@ -446,9 +446,24 @@ const previewHtml = await unified()
       }
     }
 
-    // Initialize indicator position on load
-    if (togglePreview) {
-      updateIndicator(togglePreview);
+    // Initialize indicator position after layout is complete
+    // Use double requestAnimationFrame to ensure layout/paint is finished,
+    // which fixes sizing issues on iOS Safari initial page load
+    function initializeIndicator() {
+      if (togglePreview) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            updateIndicator(togglePreview);
+          });
+        });
+      }
+    }
+
+    // Wait for fonts to load before measuring, then initialize
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(initializeIndicator);
+    } else {
+      initializeIndicator();
     }
 
     // Toggle event listeners
