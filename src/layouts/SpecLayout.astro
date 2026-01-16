@@ -31,7 +31,11 @@ const markdown = content.replace(/^---[\s\S]*?---\n/, "");
 const parsed = await parseSpecContent(markdown);
 
 // Read SVG content for inline embedding
-const svgFilePath = path.join(process.cwd(), "src/content/spec", `${version}.svg`);
+const svgFilePath = path.join(
+  process.cwd(),
+  "src/content/spec",
+  `${version}.svg`
+);
 let svgContent: string | null = null;
 if (fs.existsSync(svgFilePath)) {
   svgContent = fs.readFileSync(svgFilePath, "utf-8");
@@ -39,14 +43,19 @@ if (fs.existsSync(svgFilePath)) {
 ---
 
 <BaseLayout title={spec.data.title}>
+  <Fragment slot="head">
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href={`/spec/git-common-flow-v${version}.md`}
+      title="Raw Markdown"
+    />
+  </Fragment>
+
   <Header version={version} versions={versions} />
 
   <main>
-    <Hero
-      version={version}
-      versions={versions}
-      svgContent={svgContent}
-    />
+    <Hero version={version} versions={versions} svgContent={svgContent} />
 
     <AboutSection
       introduction={parsed.introduction}
