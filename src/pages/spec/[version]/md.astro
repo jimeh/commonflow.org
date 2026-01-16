@@ -210,31 +210,18 @@ const previewHtml = await unified()
           <!-- Copy and Download buttons -->
           <div class="flex items-center gap-3 order-1 sm:order-3">
             <!-- Copy button -->
-            <div class="relative">
-              <button
-                id="copy-btn"
-                type="button"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
-                       font-medium rounded-lg transition-colors cursor-pointer
-                       text-gray-600 dark:text-neutral-400
-                       hover:bg-gray-100 hover:text-gray-950
-                       dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
-              >
-                <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
-                <span data-copy-text>Copy</span>
-              </button>
-              <!-- Mobile tooltip -->
-              <div
-                id="copy-tooltip"
-                class="sm:hidden absolute left-1/2 -translate-x-1/2 top-full
-                       mt-2 px-2 py-1 text-xs font-medium whitespace-nowrap
-                       rounded-md shadow-sm bg-gray-900 text-white
-                       dark:bg-white dark:text-gray-900 opacity-0
-                       pointer-events-none transition-opacity duration-200"
-              >
-                Copied!
-              </div>
-            </div>
+            <button
+              id="copy-btn"
+              type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
+                     font-medium rounded-lg transition-colors cursor-pointer
+                     text-gray-600 dark:text-neutral-400
+                     hover:bg-gray-100 hover:text-gray-950
+                     dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+            >
+              <Icon name="heroicons:clipboard-document" class="w-4 h-4" />
+              <span data-copy-text>Copy</span>
+            </button>
 
             <!-- Raw button -->
             <a
@@ -390,7 +377,6 @@ const previewHtml = await unified()
     const downloadBtn = document.getElementById("download-btn");
     const rawContent = document.getElementById("markdown-raw");
     const copyText = copyBtn?.querySelector("[data-copy-text]");
-    const copyTooltip = document.getElementById("copy-tooltip");
 
     const toggleContainer = document.getElementById("toggle-container");
     const toggleCode = document.getElementById("toggle-code");
@@ -493,20 +479,10 @@ const previewHtml = await unified()
     togglePreview?.addEventListener("click", () => setActiveToggle(false));
 
     function showCopiedFeedback() {
-      // Desktop: change button text
       if (copyText) {
         copyText.textContent = "Copied!";
         setTimeout(() => {
           copyText.textContent = "Copy";
-        }, 2000);
-      }
-      // Mobile: show tooltip
-      if (copyTooltip) {
-        copyTooltip.classList.remove("opacity-0");
-        copyTooltip.classList.add("opacity-100");
-        setTimeout(() => {
-          copyTooltip.classList.remove("opacity-100");
-          copyTooltip.classList.add("opacity-0");
         }, 2000);
       }
     }
