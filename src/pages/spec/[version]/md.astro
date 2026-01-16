@@ -116,6 +116,15 @@ const previewHtml = await unified()
 ---
 
 <BaseLayout title={`${spec.data.title} - Markdown`}>
+  <Fragment slot="head">
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href={`/spec/git-common-flow-v${version}.md`}
+      title="Raw Markdown"
+    />
+  </Fragment>
+
   <!-- Header -->
   <header
     class="sticky top-0 z-50 border-b
@@ -226,6 +235,19 @@ const previewHtml = await unified()
                 Copied!
               </div>
             </div>
+
+            <!-- Raw button -->
+            <a
+              href={`/spec/git-common-flow-v${version}.md`}
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm
+                     font-medium rounded-lg transition-colors
+                     text-gray-600 dark:text-neutral-400
+                     hover:bg-gray-100 hover:text-gray-950
+                     dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+            >
+              <Icon name="heroicons:document-text" class="w-4 h-4" />
+              <span>Raw</span>
+            </a>
 
             <!-- Download button -->
             <button
