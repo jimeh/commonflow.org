@@ -35,12 +35,12 @@
     "@types/semver": "^7.7.1",
     "eslint": "^9.39.2",
     "eslint-plugin-astro": "^1.5.0",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
     "svgo": "^4.0.0",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.52.0"
+    "typescript-eslint": "^8.54.0"
   }
 }
