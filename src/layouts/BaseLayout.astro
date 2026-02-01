@@ -1,7 +1,5 @@
 ---
-import "@fontsource-variable/bricolage-grotesque";
-import "@fontsource-variable/dm-sans";
-import "@fontsource-variable/jetbrains-mono";
+import { Font } from "astro:assets";
 import "../styles/global.css";
 import { config } from "../config";
 
@@ -43,6 +41,14 @@ const canonicalUrl = Astro.url.href;
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Fonts -->
+    <Font
+      cssVariable="--font-bricolage"
+      preload={[{ weight: "700" }, { weight: "800" }]}
+    />
+    <Font cssVariable="--font-dm-sans" preload={[{ weight: "400" }]} />
+    <Font cssVariable="--font-jetbrains" preload={[{ weight: "400" }]} />
 
     <!-- Slot for page-specific head content -->
     <slot name="head" />
