@@ -47,7 +47,7 @@ The site is built to `dist/` and deployed to Cloudflare Workers.
 
 - **Astro 5.x** static site generator
 - **Tailwind CSS 4.x** for styling with dark mode support
-- **astro-icon** with Heroicons and Simple Icons for icons
+- **astro-icon** with Heroicons, Simple Icons, and custom local SVGs (`src/icons/`)
 - **Content Collections** for spec markdown files
 - **TypeScript** throughout
 - **Node.js** as JavaScript runtime (managed via mise)
