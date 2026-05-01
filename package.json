@@ -28,19 +28,19 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.6",
+    "@astrojs/check": "^0.9.9",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.2.0",
+    "@tailwindcss/vite": "^4.2.4",
     "@types/semver": "^7.7.1",
-    "eslint": "^10.0.0",
-    "eslint-plugin-astro": "^1.6.0",
-    "prettier": "^3.8.1",
+    "eslint": "^10.2.1",
+    "eslint-plugin-astro": "^1.7.0",
+    "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
-    "svgo": "^4.0.0",
+    "svgo": "^4.0.1",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.0"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1"
   }
 }
